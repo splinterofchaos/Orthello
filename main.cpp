@@ -1,0 +1,243 @@
+ 
+// Local includes.
+#include "Actor.h"
+
+#include "Font.h"
+#include "Draw.h"
+
+#include "Keyboard.h"
+#include "Timer.h"
+
+// 3rd party includes.
+#include <SDL/SDL.h>
+#include <SDL/SDL_opengl.h>
+
+// std::includes.
+#include <algorithm>  // For for_each.
+#include <functional> // For mem_fun_ref   in main.
+#include <cstdio>     // For file renaming in update_high_score.
+#include <iomanip>    // For setw          in arcade_mode.
+
+#include <sstream> // For int -> string conversions.
+
+Timer gameTimer;
+
+bool showFrameTime = false;
+
+const int SCREEN_WIDTH  = 900;
+const int SCREEN_HEIGHT = 700;
+
+// Used everywhere to write text on the screen.
+std::shared_ptr<TrueTypeFont> font;
+
+GLenum init_gl( int w, int h )
+{
+    w /= 2;
+    h /= 2;
+
+    glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
+
+    glMatrixMode( GL_PROJECTION );
+    glLoadIdentity();
+    glOrtho( -w, w, -h, h, -100, 100 );
+
+    glMatrixMode( GL_MODELVIEW );
+    glLoadIdentity();
+
+    glEnable( GL_BLEND );
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    return glGetError();
+}
+
+#ifdef __WIN32
+// Borrowed and modified from http://www.devmaster.net/forums/showthread.php?t=443
+void set_vsync( int interval = 1 )
+{
+    typedef BOOL (APIENTRY *PFNWGLSWAPINTERVALFARPROC)( int );
+    PFNWGLSWAPINTERVALFARPROC wglSwapIntervalEXT = 0;
+
+    const char *extensions = (const char*)glGetString( GL_EXTENSIONS );
+
+    if( strstr( extensions, "WGL_EXT_swap_control" ) == 0 ) {
+        return; // Error: WGL_EXT_swap_control extension not supported on your computer.\n");
+    } else {
+        wglSwapIntervalEXT = (PFNWGLSWAPINTERVALFARPROC)wglGetProcAddress( "wglSwapIntervalEXT" );
+
+        if( wglSwapIntervalEXT )
+            wglSwapIntervalEXT( interval );
+    }
+}
+#endif
+
+bool resize_window( float w_, float h_ )
+{
+    float w = w_, h = h_;
+    float ratio = (float)SCREEN_HEIGHT / SCREEN_WIDTH;
+
+    if( !SDL_SetVideoMode( w, h, 32, SDL_OPENGL|SDL_RESIZABLE ) )
+        return false;
+
+    if( w*ratio > h ) 
+        // h is the limiting factor.
+        w = h / ratio;
+    else
+        h = w * ratio;
+
+    float wOff = ( w_ - w ) / 2;
+    float hOff = ( h_ - h );
+
+    glViewport( wOff, hOff, w, h );
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho( 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, -10, 10 );
+    glMatrixMode(GL_MODELVIEW);
+
+    return true;
+}
+
+bool make_sdl_gl_window( int w, int h )
+{
+    if( ! resize_window(w,h) )
+        return false;
+    init_gl( w, h );
+
+    font.reset( new TrueTypeFont("art/font/xlmonoalt.ttf", 20) );
+
+#ifdef __WIN32
+    set_vsync( 0 );
+#endif
+
+    return true;
+}
+
+void update_screen()
+{
+    SDL_GL_SwapBuffers();
+    glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+}
+
+void keyboard_events()
+{
+}
+
+int main( int, char** )
+{
+    const int IDEAL_FRAME_TIME = Timer::SECOND / 60;
+    const int MAX_FRAME_TIME = 3 * IDEAL_FRAME_TIME;
+
+    bool quit = false;
+    bool paused = false;
+
+    if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 )
+        return 1;
+    make_sdl_gl_window( 600, 600 );
+
+    Timer frameTimer;
+    while( quit == false )
+    {
+        Keyboard::update();
+
+        static SDL_Event event;
+		while( SDL_PollEvent(&event) )
+		{
+            switch( event.type ) 
+            {
+              case SDL_QUIT: quit = true; break;
+
+              case SDL_KEYDOWN:
+                Keyboard::add_key_status( event.key.keysym.sym, Keyboard::PRESSED ); break;
+
+              case SDL_VIDEORESIZE:
+                float w=event.resize.w, h=event.resize.h;
+                resize_window( w, h );
+                break;
+            }
+        }
+
+        keyboard_events();
+
+        // These lines use local vars thus couldn't be in keyboard_events.
+        if( Keyboard::key_state('p') )
+            paused = ! paused;
+        if( Keyboard::key_state( Keyboard::ESQ ) )
+            quit = true;
+
+        float DT = IDEAL_FRAME_TIME * ( 1.f / 4.f );
+        //
+        // For each time-step:
+        static int time = 0;
+        for( time += frameTimer.time_ms(); !paused && time >= DT; time -= DT ) 
+        {
+        }
+
+        typedef Vector<float,2> V2;
+        typedef Vector<float,3> V3;
+
+        V2 tmp1[] = {
+            V2(-100, -100),
+            V2( 100, -100),
+            V2( 100,  100),
+            V2(-100,  100)
+        };
+
+        V3 tmp2[] = {
+            V3(-100, -100, -100 ),
+            V3(-100, -100,  100 ),
+            V3(-100,  100,  100 ),
+            V3(-100,  100, -100 ),
+        };
+            
+
+        draw::Verts< V2 > boarderTop( tmp1, 4 );
+        draw::Verts< V3 > boarderFromt( tmp2, 4 );
+
+        glColor3f( 1, 1, 1 );
+        glTranslatef( 300, 300, 0 );
+        draw::draw( boarderTop, GL_LINE_LOOP );
+        draw::draw( boarderFromt, GL_LINE_LOOP );
+        glLoadIdentity();
+
+        static Timer realTimer;
+        realTimer.update();
+        static int lastUpdate = realTimer.time_ms();
+        if( lastUpdate + IDEAL_FRAME_TIME/2 <= realTimer.time_ms() ) {
+            glRotatef( 45, 1, 0, 0 );
+            glTranslatef( 300, -300, 0 );
+            update_screen();
+        }
+        
+        if( paused )
+            frameTimer.zero();
+
+        if( showFrameTime ) {
+            std::stringstream ss;
+            TextBox b( *font, 10, 600 );
+
+            float val = frameTimer.time_sec();
+            if( !val )
+                val = 0.5;
+
+            ss << "fps: " << ( 1.f / val );
+            b.writeln( ss.str() );
+
+            ss.str( "" );
+            ss << "time: " << gameTimer.time_sec();
+            b.writeln( ss.str() );
+        }
+
+        frameTimer.reset();
+        frameTimer.clamp_ms( MAX_FRAME_TIME );
+
+        frameTimer.clamp_ms( frameTimer.time_ms() );
+
+        gameTimer.update();
+    }
+
+    glFinish();
+    SDL_Quit();
+
+    return 0;
+}
+
+
