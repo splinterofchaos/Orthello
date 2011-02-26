@@ -2,7 +2,6 @@
 // Local includes.
 #include "Actor.h"
 
-#include "Font.h"
 #include "Draw.h"
 
 #include "Keyboard.h"
@@ -27,22 +26,37 @@ bool showFrameTime = false;
 const int SCREEN_WIDTH  = 900;
 const int SCREEN_HEIGHT = 700;
 
-// Used everywhere to write text on the screen.
-std::shared_ptr<TrueTypeFont> font;
+bool resize_window( float w_, float h_ )
+{
+    float w = w_, h = h_;
+    float ratio = (float)SCREEN_HEIGHT / SCREEN_WIDTH;
+
+    if( !SDL_SetVideoMode( w, h, 32, SDL_OPENGL|SDL_RESIZABLE ) )
+        return false;
+
+    if( w*ratio > h ) 
+        // h is the limiting factor.
+        w = h / ratio;
+    else
+        h = w * ratio;
+
+    float wOff = ( w_ - w ) / 2;
+    float hOff = ( h_ - h );
+
+    glViewport( wOff, hOff, w, h );
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho( -SCREEN_WIDTH/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, -SCREEN_HEIGHT/2, -1000, 1000 );
+    glMatrixMode(GL_MODELVIEW);
+
+    return true;
+}
 
 GLenum init_gl( int w, int h )
 {
-    w /= 2;
-    h /= 2;
-
     glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 
-    glMatrixMode( GL_PROJECTION );
-    glLoadIdentity();
-    glOrtho( -w, w, -h, h, -100, 100 );
-
-    glMatrixMode( GL_MODELVIEW );
-    glLoadIdentity();
+    resize_window( w, h );
 
     glEnable( GL_BLEND );
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -70,39 +84,11 @@ void set_vsync( int interval = 1 )
 }
 #endif
 
-bool resize_window( float w_, float h_ )
-{
-    float w = w_, h = h_;
-    float ratio = (float)SCREEN_HEIGHT / SCREEN_WIDTH;
-
-    if( !SDL_SetVideoMode( w, h, 32, SDL_OPENGL|SDL_RESIZABLE ) )
-        return false;
-
-    if( w*ratio > h ) 
-        // h is the limiting factor.
-        w = h / ratio;
-    else
-        h = w * ratio;
-
-    float wOff = ( w_ - w ) / 2;
-    float hOff = ( h_ - h );
-
-    glViewport( wOff, hOff, w, h );
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho( 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, -10, 10 );
-    glMatrixMode(GL_MODELVIEW);
-
-    return true;
-}
-
 bool make_sdl_gl_window( int w, int h )
 {
     if( ! resize_window(w,h) )
         return false;
     init_gl( w, h );
-
-    font.reset( new TrueTypeFont("art/font/xlmonoalt.ttf", 20) );
 
 #ifdef __WIN32
     set_vsync( 0 );
@@ -131,7 +117,7 @@ int main( int, char** )
 
     if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 )
         return 1;
-    make_sdl_gl_window( 600, 600 );
+    make_sdl_gl_window( SCREEN_WIDTH, SCREEN_HEIGHT );
 
     Timer frameTimer;
     while( quit == false )
@@ -174,11 +160,11 @@ int main( int, char** )
         typedef Vector<float,2> V2;
         typedef Vector<float,3> V3;
 
-        V2 tmp1[] = {
-            V2(-100, -100),
-            V2( 100, -100),
-            V2( 100,  100),
-            V2(-100,  100)
+        V3 tmp1[] = {
+            V3(-100, -100, 100),
+            V3( 100, -100, 100),
+            V3( 100,  100, 100),
+            V3(-100,  100, 100)
         };
 
         V3 tmp2[] = {
@@ -189,12 +175,12 @@ int main( int, char** )
         };
             
 
-        draw::Verts< V2 > boarderTop( tmp1, 4 );
+        draw::Verts< V3 > boarderTop( tmp1, 4 );
         draw::Verts< V3 > boarderFromt( tmp2, 4 );
 
         glColor3f( 1, 1, 1 );
-        glTranslatef( 300, 300, 0 );
         draw::draw( boarderTop, GL_LINE_LOOP );
+        glColor3f( 1, 0, 1 );
         draw::draw( boarderFromt, GL_LINE_LOOP );
         glLoadIdentity();
 
@@ -203,28 +189,12 @@ int main( int, char** )
         static int lastUpdate = realTimer.time_ms();
         if( lastUpdate + IDEAL_FRAME_TIME/2 <= realTimer.time_ms() ) {
             glRotatef( 45, 1, 0, 0 );
-            glTranslatef( 300, -300, 0 );
+            glRotatef( 45, 0, 0, 1 );
             update_screen();
         }
         
         if( paused )
             frameTimer.zero();
-
-        if( showFrameTime ) {
-            std::stringstream ss;
-            TextBox b( *font, 10, 600 );
-
-            float val = frameTimer.time_sec();
-            if( !val )
-                val = 0.5;
-
-            ss << "fps: " << ( 1.f / val );
-            b.writeln( ss.str() );
-
-            ss.str( "" );
-            ss << "time: " << gameTimer.time_sec();
-            b.writeln( ss.str() );
-        }
 
         frameTimer.reset();
         frameTimer.clamp_ms( MAX_FRAME_TIME );
