@@ -157,7 +157,7 @@ int main( int, char** )
         return 1;
     make_sdl_gl_window( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-    Platform platform1( vector(0,0) );
+    Platform platform1( vector(-100,-50) );
     Platform platform2( vector(100,50) );
 
     Timer frameTimer;
