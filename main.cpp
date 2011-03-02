@@ -6,6 +6,7 @@
 
 #include "Keyboard.h"
 #include "Timer.h"
+#include "Collision.h"
 
 // 3rd party includes.
 #include <SDL/SDL.h>
@@ -107,16 +108,18 @@ void keyboard_events()
 {
 }
 
-struct Square
+struct Platform : Square
 {
     typedef Vector<float,2> Vec;
 
-    Vec s; // Position or state.
-    float scale;
+    int growthLeft;
 
-    Square( const Vec& pos, float scale )
-        : s( pos ), scale( scale )
+    Platform( const Vec& pos )
     {
+        s = pos;
+        scale = 0;
+
+        growthLeft = 1;
     }
 
     void draw()
@@ -140,7 +143,7 @@ struct Square
 
 };
 
-std::vector< Square > squares;
+std::vector< Platform > squares;
 
 int main( int, char** )
 {
@@ -154,7 +157,8 @@ int main( int, char** )
         return 1;
     make_sdl_gl_window( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-    Square s( vector(0,0), 100 );
+    Platform platform1( vector(0,0) );
+    Platform platform2( vector(100,50) );
 
     Timer frameTimer;
     while( quit == false )
@@ -192,9 +196,20 @@ int main( int, char** )
         static int time = 0;
         for( time += frameTimer.time_ms(); !paused && time >= DT; time -= DT ) 
         {
+            if( platform1.growthLeft )
+                platform1.scale += 1;
+            if( platform2.growthLeft )
+                platform2.scale += 1;
+
+            if( square_square_collision(platform1, platform2)  ) {
+                platform1.growthLeft = 0;
+                platform2.growthLeft = 0;
+            }
+                
         }
 
-        s.draw();
+        platform1.draw();
+        platform2.draw();
 
         static Timer realTimer;
         realTimer.update();
