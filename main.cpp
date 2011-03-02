@@ -107,6 +107,41 @@ void keyboard_events()
 {
 }
 
+struct Square
+{
+    typedef Vector<float,2> Vec;
+
+    Vec s; // Position or state.
+    float scale;
+
+    Square( const Vec& pos, float scale )
+        : s( pos ), scale( scale )
+    {
+    }
+
+    void draw()
+    {
+        glTranslatef( s.x(), s.y(), 0 );
+        
+        Vec square[] = {
+            Vec( -scale, -scale ),
+            Vec(  scale, -scale ),
+            Vec(  scale,  scale ),
+            Vec( -scale,  scale )
+        };
+
+        draw::Verts< Vec > verts( square, 4 );
+
+        glColor3f( 0.4, 0.9, 0.5 );
+        draw::draw( verts );
+
+        glLoadIdentity();
+    }
+
+};
+
+std::vector< Square > squares;
+
 int main( int, char** )
 {
     const int IDEAL_FRAME_TIME = Timer::SECOND / 60;
@@ -118,6 +153,8 @@ int main( int, char** )
     if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 )
         return 1;
     make_sdl_gl_window( SCREEN_WIDTH, SCREEN_HEIGHT );
+
+    Square s( vector(0,0), 100 );
 
     Timer frameTimer;
     while( quit == false )
@@ -157,32 +194,7 @@ int main( int, char** )
         {
         }
 
-        typedef Vector<float,2> V2;
-        typedef Vector<float,3> V3;
-
-        V3 tmp1[] = {
-            V3(-100, -100, 100),
-            V3( 100, -100, 100),
-            V3( 100,  100, 100),
-            V3(-100,  100, 100)
-        };
-
-        V3 tmp2[] = {
-            V3(-100, -100, -100 ),
-            V3(-100, -100,  100 ),
-            V3(-100,  100,  100 ),
-            V3(-100,  100, -100 ),
-        };
-            
-
-        draw::Verts< V3 > boarderTop( tmp1, 4 );
-        draw::Verts< V3 > boarderFromt( tmp2, 4 );
-
-        glColor3f( 1, 1, 1 );
-        draw::draw( boarderTop, GL_LINE_LOOP );
-        glColor3f( 1, 0, 1 );
-        draw::draw( boarderFromt, GL_LINE_LOOP );
-        glLoadIdentity();
+        s.draw();
 
         static Timer realTimer;
         realTimer.update();
