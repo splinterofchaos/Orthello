@@ -124,6 +124,7 @@ struct Platform : Square
 
     void draw()
     {
+        glPushMatrix();
         glTranslatef( s.x(), s.y(), 0 );
         
         Vec square[] = {
@@ -138,7 +139,7 @@ struct Platform : Square
         glColor3f( 0.4, 0.9, 0.5 );
         draw::draw( verts );
 
-        glLoadIdentity();
+        glPopMatrix();
     }
 
 };
@@ -215,6 +216,8 @@ int main( int, char** )
         realTimer.update();
         static int lastUpdate = realTimer.time_ms();
         if( lastUpdate + IDEAL_FRAME_TIME/2 <= realTimer.time_ms() ) {
+            glLoadIdentity();
+
             glRotatef( 45, 1, 0, 0 );
             glRotatef( 45, 0, 0, 1 );
             update_screen();
