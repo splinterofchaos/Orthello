@@ -6,6 +6,8 @@
 
 #include "Keyboard.h"
 #include "Timer.h"
+
+#include "Random.h"
 #include "Collision.h"
 
 // 3rd party includes.
@@ -159,8 +161,13 @@ int main( int, char** )
         return 1;
     make_sdl_gl_window( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-    platforms.push_back( Platform(vector(-100,-50)) );
-    platforms.push_back( Platform(vector( 100, 50)) );
+    for( int i=0; i < 100; i++ )
+    {
+        Vector<float,2> pos;
+        pos.x( random(-400, 400) );
+        pos.y( random(-400, 400) );
+        platforms.push_back( Platform( pos ) );
+    }
 
     Timer frameTimer;
     while( quit == false )
