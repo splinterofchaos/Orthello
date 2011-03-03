@@ -144,7 +144,8 @@ struct Platform : Square
 
 };
 
-std::vector< Platform > squares;
+typedef std::vector< Platform > Platforms;
+Platforms platforms;
 
 int main( int, char** )
 {
@@ -158,8 +159,8 @@ int main( int, char** )
         return 1;
     make_sdl_gl_window( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-    Platform platform1( vector(-100,-50) );
-    Platform platform2( vector(100,50) );
+    platforms.push_back( Platform(vector(-100,-50)) );
+    platforms.push_back( Platform(vector( 100, 50)) );
 
     Timer frameTimer;
     while( quit == false )
@@ -197,30 +198,36 @@ int main( int, char** )
         static int time = 0;
         for( time += frameTimer.time_ms(); !paused && time >= DT; time -= DT ) 
         {
-            if( platform1.growthLeft )
-                platform1.scale += 1;
-            if( platform2.growthLeft )
-                platform2.scale += 1;
+            for( size_t i=0; i < platforms.size(); i++ )
+                if( platforms[i].growthLeft )
+                    platforms[i].scale += 1;
 
-            if( !square_square_collision(platform1, platform2)  ) {
-                platform1.growthLeft = 0;
-                platform2.growthLeft = 0;
+            for( size_t i=0; i < platforms.size(); i++ )
+            {
+                for( size_t j=i+1; j < platforms.size(); j++ )
+                {
+                    if( !square_square_collision(platforms[i], platforms[j]) )
+                    {
+                        platforms[i].growthLeft = 0;
+                        platforms[j].growthLeft = 0;
+                    }
+                }
             }
-                
         }
 
-        platform1.draw();
-        platform2.draw();
+        for( size_t i=0; i < platforms.size(); i++ )
+            platforms[i].draw();
 
         static Timer realTimer;
         realTimer.update();
         static int lastUpdate = realTimer.time_ms();
         if( lastUpdate + IDEAL_FRAME_TIME/2 <= realTimer.time_ms() ) {
-            glLoadIdentity();
+            update_screen();
 
+            // Rotate the scene for the next run.
+            glLoadIdentity();
             glRotatef( 45, 1, 0, 0 );
             glRotatef( 45, 0, 0, 1 );
-            update_screen();
         }
         
         if( paused )
