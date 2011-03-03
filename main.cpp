@@ -201,7 +201,7 @@ int main( int, char** )
             if( platform2.growthLeft )
                 platform2.scale += 1;
 
-            if( square_square_collision(platform1, platform2)  ) {
+            if( !square_square_collision(platform1, platform2)  ) {
                 platform1.growthLeft = 0;
                 platform2.growthLeft = 0;
             }

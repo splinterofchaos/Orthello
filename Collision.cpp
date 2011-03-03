@@ -13,16 +13,8 @@ bool intersecting_range( float min1, float max1, float min2, float max2 )
 
 bool square_square_collision( const Square& s1, const Square& s2 )
 {
-    float minXs1 = s1.s.x() - s1.scale/2;
-    float maxXs1 = minXs1 + s1.scale;
-    float minYs1 = s1.s.y() - s1.scale/2;
-    float maxYs1 = minYs1 + s1.scale;
+    Vector<float,2> d = s1.s - s2.s;
+    float scale = s1.scale + s2.scale;
 
-    float minXs2 = s2.s.x() - s2.scale/2;
-    float maxXs2 = minXs2 + s2.scale;
-    float minYs2 = s2.s.y() - s2.scale/2;
-    float maxYs2 = minYs2 + s2.scale;
-
-    return intersecting_range( minXs1, maxXs1, minXs2, maxXs2 ) &&
-           intersecting_range( minYs1, maxYs1, minYs2, maxYs2 );
+    return std::abs(d.x()) > scale && std::abs(d.y()) > scale;
 }
