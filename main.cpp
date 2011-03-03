@@ -62,7 +62,10 @@ GLenum init_gl( int w, int h )
     resize_window( w, h );
 
     glEnable( GL_BLEND );
-    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
+    glDepthFunc( GL_LEQUAL );
+    glEnable( GL_DEPTH_TEST );
 
     return glGetError();
 }
@@ -133,20 +136,44 @@ class Platform : public Square
 
     void draw()
     {
+        float z = scale;
+
         glPushMatrix();
-        glTranslatef( s.x(), s.y(), scale/1000 );
+        glTranslatef( s.x(), s.y(), z );
         
-        Vec square[] = {
-            Vec( -scale, -scale ),
-            Vec(  scale, -scale ),
-            Vec(  scale,  scale ),
-            Vec( -scale,  scale )
+        typedef Vector<float,3> Vec3;
+
+        Vec3 square[] = {
+            Vec3( -scale, -scale, z ),
+            Vec3(  scale, -scale, z ),
+            Vec3(  scale,  scale, z ),
+            Vec3( -scale,  scale, z )
         };
 
-        draw::Verts< Vec > verts( square, 4 );
+        Vec3 wall[] = {
+            Vec3( -scale, -scale,   z ),
+            Vec3( -scale, -scale, -100 ),
+            Vec3( -scale,  scale, -100 ),
+            Vec3( -scale,  scale,   z )
+        };
+
+        draw::Verts< Vec3 > verts( square, 4 );
+        draw::Verts< Vec3 > side( wall, 4 );
 
         glColor3f( r, g, b );
         draw::draw( verts );
+
+        float intensity = 1;//( r + g + b ) / 3;
+        glColor3f( 0.4*intensity, 8.4*intensity, 0.1*intensity );
+
+    
+        draw::draw( side );
+        glRotatef( 90, 0, 0, 1 );
+        draw::draw( side );
+        glRotatef( 90, 0, 0, 1 );
+        draw::draw( side );
+        glRotatef( 90, 0, 0, 1 );
+        draw::draw( side );
 
         glPopMatrix();
     }
