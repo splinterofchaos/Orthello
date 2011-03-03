@@ -247,7 +247,7 @@ int main( int, char** )
         {
             for( size_t i=0; i < platforms.size(); i++ )
                 if( platforms[i].growthLeft )
-                    platforms[i].scale += 1;
+                    platforms[i].scale += random( 0.7f, 1.4f );
 
             for( size_t i=0; i < platforms.size(); i++ )
             {
