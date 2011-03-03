@@ -206,7 +206,7 @@ int main( int, char** )
             {
                 for( size_t j=i+1; j < platforms.size(); j++ )
                 {
-                    if( !square_square_collision(platforms[i], platforms[j]) )
+                    if( square_square_collision(platforms[i], platforms[j]) )
                     {
                         platforms[i].growthLeft = 0;
                         platforms[j].growthLeft = 0;
