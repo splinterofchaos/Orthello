@@ -26,30 +26,15 @@ Timer gameTimer;
 
 bool showFrameTime = false;
 
-const int SCREEN_WIDTH  = 900;
-const int SCREEN_HEIGHT = 700;
-
 bool resize_window( float w_, float h_ )
 {
-    float w = w_, h = h_;
-    float ratio = (float)SCREEN_HEIGHT / SCREEN_WIDTH;
-
-    if( !SDL_SetVideoMode( w, h, 32, SDL_OPENGL|SDL_RESIZABLE ) )
+    if( !SDL_SetVideoMode( w_, h_, 32, SDL_OPENGL|SDL_RESIZABLE ) )
         return false;
 
-    if( w*ratio > h ) 
-        // h is the limiting factor.
-        w = h / ratio;
-    else
-        h = w * ratio;
-
-    float wOff = ( w_ - w ) / 2;
-    float hOff = ( h_ - h );
-
-    glViewport( wOff, hOff, w, h );
+    glViewport( 0, 0, w_, h_ );
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho( -SCREEN_WIDTH/2, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, -SCREEN_HEIGHT/2, -1000, 1000 );
+    glOrtho( -w_/2, w_/2, h_/2, -h_/2, -1000, 1000 );
     glMatrixMode(GL_MODELVIEW);
 
     return true;
@@ -166,7 +151,7 @@ int main( int, char** )
 
     if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 )
         return 1;
-    make_sdl_gl_window( SCREEN_WIDTH, SCREEN_HEIGHT );
+    make_sdl_gl_window( 600, 600 );
 
     for( int i=0; i < 300; i++ )
     {
