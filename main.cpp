@@ -228,9 +228,11 @@ int main( int, char** )
                             platforms[j].growthLeft -= 1;
 
                         // Remove square significantly within another.
-                        if( point_square_collision(platforms[i].s, platforms[j]) )
+                        Square scaledDownI = platforms[i], scaledDownJ = platforms[j];
+                        scaledDownI.scale *= 0.2; scaledDownJ.scale *= 0.2;
+                        if( square_square_collision(scaledDownI, platforms[j]) )
                             platforms.erase( platforms.begin() + i );
-                        else if( point_square_collision(platforms[j].s, platforms[i]) )
+                        else if( square_square_collision(scaledDownJ, platforms[i]) )
                             platforms.erase( platforms.begin() + j );
                     }
                 }
