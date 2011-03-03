@@ -110,8 +110,11 @@ void keyboard_events()
 {
 }
 
-struct Platform : Square
+class Platform : public Square
 {
+    float r, g, b;
+
+  public:
     typedef Vector<float,2> Vec;
 
     int growthLeft;
@@ -122,6 +125,10 @@ struct Platform : Square
         scale = 0;
 
         growthLeft = 50;
+
+        r = random( 0.3f, 0.5f );
+        g = random( 0.7f, 1.0f );
+        b = random( 0.4f, 0.6f );
     }
 
     void draw()
@@ -138,7 +145,7 @@ struct Platform : Square
 
         draw::Verts< Vec > verts( square, 4 );
 
-        glColor3f( 0.4, 0.9, 0.5 );
+        glColor3f( r, g, b );
         draw::draw( verts );
 
         glPopMatrix();
