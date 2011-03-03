@@ -226,6 +226,12 @@ int main( int, char** )
                             platforms[i].growthLeft -= 1;
                         if( platforms[j].growthLeft )
                             platforms[j].growthLeft -= 1;
+
+                        // Remove square significantly within another.
+                        if( point_square_collision(platforms[i].s, platforms[j]) )
+                            platforms.erase( platforms.begin() + i );
+                        else if( point_square_collision(platforms[j].s, platforms[i]) )
+                            platforms.erase( platforms.begin() + j );
                     }
                 }
             }
