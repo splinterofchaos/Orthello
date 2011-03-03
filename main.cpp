@@ -121,7 +121,7 @@ struct Platform : Square
         s = pos;
         scale = 0;
 
-        growthLeft = 1;
+        growthLeft = 50;
     }
 
     void draw()
@@ -161,7 +161,7 @@ int main( int, char** )
         return 1;
     make_sdl_gl_window( SCREEN_WIDTH, SCREEN_HEIGHT );
 
-    for( int i=0; i < 100; i++ )
+    for( int i=0; i < 300; i++ )
     {
         Vector<float,2> pos;
         pos.x( random(-400, 400) );
@@ -215,8 +215,10 @@ int main( int, char** )
                 {
                     if( square_square_collision(platforms[i], platforms[j]) )
                     {
-                        platforms[i].growthLeft = 0;
-                        platforms[j].growthLeft = 0;
+                        if( platforms[i].growthLeft )
+                            platforms[i].growthLeft -= 1;
+                        if( platforms[j].growthLeft )
+                            platforms[j].growthLeft -= 1;
                     }
                 }
             }
