@@ -134,7 +134,7 @@ class Platform : public Square
     void draw()
     {
         glPushMatrix();
-        glTranslatef( s.x(), s.y(), 0 );
+        glTranslatef( s.x(), s.y(), scale/1000 );
         
         Vec square[] = {
             Vec( -scale, -scale ),
