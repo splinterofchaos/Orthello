@@ -44,15 +44,73 @@ struct Player
     static Texture img;
 
     Vector<float,2> s;
+    Platform *plat, *prevPlat;
+
+    Player()
+    {
+        plat = prevPlat = 0;
+    }
 
     void move( int dt )
     {
+        if( ! plat )
+            return;
+
+        s = plat->s;
+
+        plat->r = 1;
+        plat->g = 0;
+        plat->b = 0;
+
+        static int jumpCoolDown = 1000;
+        jumpCoolDown -= dt;
+
+        if( jumpCoolDown < 0 ) {
+            Vector<float,2> input( 0, 0 );
+
+            if( Keyboard::key_down('w') )
+                input.y() += -1;
+            if( Keyboard::key_down('s') )
+                input.y() +=  1;
+            if( Keyboard::key_down('a') )
+                input.x() += -1;
+            if( Keyboard::key_down('d') )
+                input.x() +=  1;
+
+            if( magnitude(input) > 0.01f ) 
+            {
+                Vector<float,2> direction;
+                direction.x( std::cos(-zRot)*input.x() - std::sin(-zRot)*input.y() );
+                direction.y( std::sin(-zRot)*input.x() + std::cos(-zRot)*input.y() );
+
+                float maxDot = 0;
+                for( size_t i=0; i < plat->adjacents.size(); i++ ) 
+                {
+                    Vector<float,2> d = plat->adjacents[i]->s - plat->s;
+
+                    float dot = d * direction;
+                    if( dot > maxDot ) {
+                        maxDot = dot;
+                        prevPlat = plat->adjacents[i];
+                    }
+                }
+
+                if( maxDot > 0 ) {
+                    plat = prevPlat;
+                    jumpCoolDown = 1000;
+                }
+            }
+        }
     }
 
     void draw()
     {
+        float z = 0;
+        if( plat )
+            z = plat->height();
+
         glPushMatrix();
-        glTranslatef( s.x(), s.y(), 100 );
+        glTranslatef( s.x(), s.y(), z );
         glRotatef( -zRot, 0, 0, 1 );
         glRotatef(    90, 1, 0, 0 );
 
@@ -194,8 +252,12 @@ int main( int, char** )
                 } // For platforms[i].
 
                 if( ! growing )
-                    player.s = platforms[ random(0, platforms.size()) ].s;
+                    player.plat = &platforms[ random(0, platforms.size()) ];
             } // If growing.
+            else
+            {
+                player.move( DT );
+            }
         } // For each timestep.
 
         for( size_t i=0; i < platforms.size(); i++ )
