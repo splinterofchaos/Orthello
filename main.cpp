@@ -116,14 +116,14 @@ class Platform : public Square
 
         growthLeft = 50;
 
-        r = random( 0.3f, 0.5f );
+        r = random( 0.2f, 0.4f );
         g = random( 0.7f, 1.0f );
-        b = random( 0.4f, 0.6f );
+        b = random( 0.4f, 0.5f );
     }
 
     void draw()
     {
-        float z = scale;
+        float z = scale / 2;
 
         glPushMatrix();
         glTranslatef( s.x(), s.y(), z );
