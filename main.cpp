@@ -227,9 +227,11 @@ int main( int, char** )
                         if( platforms[j].growthLeft )
                             platforms[j].growthLeft -= 1;
 
+                        const float SCALE = 0.15;
+
                         // Remove square significantly within another.
                         Square scaledDownI = platforms[i], scaledDownJ = platforms[j];
-                        scaledDownI.scale *= 0.2; scaledDownJ.scale *= 0.2;
+                        scaledDownI.scale *= SCALE; scaledDownJ.scale *= SCALE;
                         if( square_square_collision(scaledDownI, platforms[j]) )
                             platforms.erase( platforms.begin() + i );
                         else if( square_square_collision(scaledDownJ, platforms[i]) )
