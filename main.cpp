@@ -26,16 +26,16 @@ Timer gameTimer;
 
 bool showFrameTime = false;
 
-bool resize_window( float w_, float h_ )
+bool resize_window( float w, float h )
 {
-    if( !SDL_SetVideoMode( w_, h_, 32, SDL_OPENGL|SDL_RESIZABLE ) )
+    if( !SDL_SetVideoMode(w, h, 32, SDL_OPENGL|SDL_RESIZABLE) )
         return false;
 
-    glViewport( 0, 0, w_, h_ );
-    glMatrixMode(GL_PROJECTION);
+    glViewport( 0, 0, w, h );
+    glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
-    glOrtho( -w_/2, w_/2, h_/2, -h_/2, -1000, 1000 );
-    glMatrixMode(GL_MODELVIEW);
+    glOrtho( -w/2, w/2, h/2, -h/2, -1000, 1000 );
+    glMatrixMode( GL_MODELVIEW );
 
     return true;
 }
