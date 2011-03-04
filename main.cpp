@@ -26,6 +26,8 @@ Timer gameTimer;
 
 bool showFrameTime = false;
 
+float zRot = 0;
+
 bool resize_window( float w, float h )
 {
     if( !SDL_SetVideoMode(w, h, 32, SDL_OPENGL|SDL_RESIZABLE) )
@@ -230,6 +232,11 @@ int main( int, char** )
         static int time = 0;
         for( time += frameTimer.time_ms(); !paused && time >= DT; time -= DT ) 
         {
+            if( Keyboard::key_down('q') )
+                zRot += 0.1;
+            if( Keyboard::key_down('e') )
+                zRot -= 0.1;
+
             for( size_t i=0; i < platforms.size(); i++ )
                 if( platforms[i].growthLeft )
                     platforms[i].scale += random( 0.7f, 1.4f );
@@ -267,7 +274,7 @@ int main( int, char** )
             // Rotate the scene for the next run.
             glLoadIdentity();
             glRotatef( 45, 1, 0, 0 );
-            glRotatef( 45, 0, 0, 1 );
+            glRotatef( 45 + zRot, 0, 0, 1 );
         }
         
         if( paused )
