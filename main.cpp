@@ -99,34 +99,56 @@ int main( int, char** )
             if( Keyboard::key_down('e') )
                 zRot -= 0.1;
 
-            for( size_t i=0; i < platforms.size(); i++ )
-                if( platforms[i].growthLeft )
-                    platforms[i].scale += random( 0.7f, 1.4f );
+            static bool growing = true;
 
-            for( size_t i=0; i < platforms.size(); i++ )
+            bool didGrow = false;
+            if( growing ) 
             {
-                for( size_t j=i+1; j < platforms.size(); j++ )
-                {
-                    if( square_square_collision(platforms[i], platforms[j]) )
-                    {
-                        if( platforms[i].growthLeft )
-                            platforms[i].growthLeft -= 1;
-                        if( platforms[j].growthLeft )
-                            platforms[j].growthLeft -= 1;
+                // Grow all.
+                for( size_t i=0; i < platforms.size(); i++ ) {
 
-                        const float SCALE = 0.15;
-
-                        // Remove square significantly within another.
-                        Square scaledDownI = platforms[i], scaledDownJ = platforms[j];
-                        scaledDownI.scale *= SCALE; scaledDownJ.scale *= SCALE;
-                        if( square_square_collision(scaledDownI, platforms[j]) )
-                            platforms.erase( platforms.begin() + i );
-                        else if( square_square_collision(scaledDownJ, platforms[i]) )
-                            platforms.erase( platforms.begin() + j );
+                    if( platforms[i].growthLeft ) { 
+                        platforms[i].scale += random( 0.7f, 1.4f );
+                        didGrow = true;
                     }
                 }
-            }
-        }
+
+                growing = didGrow;
+
+                // Collide & link all.
+                for( size_t i=0; i < platforms.size(); i++ )
+                {
+                    for( size_t j=i+1; j < platforms.size(); j++ )
+                    {
+                        if( square_square_collision(platforms[i], platforms[j]) )
+                        {
+                            // If we stopped growing,
+                            if( !growing ) {
+                                // We can build the map.
+                                platforms[i].add_adjacent( &platforms[j] );
+                                platforms[j].add_adjacent( &platforms[i] );
+                            }
+
+                            if( platforms[i].growthLeft )
+                                platforms[i].growthLeft -= 1;
+                            if( platforms[j].growthLeft )
+                                platforms[j].growthLeft -= 1;
+
+                            const float SCALE = 0.15;
+
+                            // Remove square significantly within another.
+                            Square scaledDownI = platforms[i], scaledDownJ = platforms[j];
+                            scaledDownI.scale *= SCALE; scaledDownJ.scale *= SCALE;
+
+                            if( square_square_collision(scaledDownI, platforms[j]) )
+                                platforms.erase( platforms.begin() + i );
+                            else if( square_square_collision(scaledDownJ, platforms[i]) )
+                                platforms.erase( platforms.begin() + j );
+                        }
+                    } // For platforms[j].
+                } // For platforms[i].
+            } // If growing.
+        } // For each timestep.
 
         for( size_t i=0; i < platforms.size(); i++ )
             platforms[i].draw();
