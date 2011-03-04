@@ -4,6 +4,7 @@
 #include "Platform.h"
 
 #include "Draw.h"
+#include "Texture.h"
 
 #include "Keyboard.h"
 #include "Timer.h"
@@ -40,6 +41,8 @@ Platforms platforms;
 
 struct Player
 {
+    static Texture img;
+
     Vector<float,2> s;
 
     void move( int dt )
@@ -48,8 +51,32 @@ struct Player
 
     void draw()
     {
+        glPushMatrix();
+        glTranslatef( s.x(), s.y(), 100 );
+        glRotatef( 90, 1, 0, 0 );
+
+        Vector<float,2> tmpVerts[] = {
+            vector( -50.f, -50.f ),
+            vector(  50.f, -50.f ),
+            vector(  50.f,  50.f ),
+            vector( -50.f,  50.f )
+        };
+
+        Vector<int,2> tmpCoord[] = {
+            vector( 0, 0 ),
+            vector( 1, 0 ),
+            vector( 1, 1 ),
+            vector( 0, 1 )
+        };
+
+        draw::Verts< Vector<float,2> > verts( tmpVerts, 4 );
+
+        draw::draw( verts );
+
+        glPopMatrix();
     }
 };
+Texture Player::img;
 
 int main( int, char** )
 {
@@ -72,6 +99,8 @@ int main( int, char** )
     }
 
     Player player;
+
+    Player::img.load( "art/Orbital.bmp" );
 
     Timer frameTimer;
     while( quit == false )
@@ -170,6 +199,8 @@ int main( int, char** )
 
         for( size_t i=0; i < platforms.size(); i++ )
             platforms[i].draw();
+
+        player.draw();
 
         static Timer realTimer;
         realTimer.update();
