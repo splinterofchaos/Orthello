@@ -38,6 +38,19 @@ void keyboard_events()
 typedef std::vector< Platform > Platforms;
 Platforms platforms;
 
+struct Player
+{
+    Vector<float,2> s;
+
+    void move( int dt )
+    {
+    }
+
+    void draw()
+    {
+    }
+};
+
 int main( int, char** )
 {
     const int IDEAL_FRAME_TIME = Timer::SECOND / 60;
@@ -57,6 +70,8 @@ int main( int, char** )
         pos.y( random(-400, 400) );
         platforms.push_back( Platform( pos ) );
     }
+
+    Player player;
 
     Timer frameTimer;
     while( quit == false )
@@ -147,6 +162,9 @@ int main( int, char** )
                         }
                     } // For platforms[j].
                 } // For platforms[i].
+
+                if( ! growing )
+                    player.s = platforms[ random(0, platforms.size()) ].s;
             } // If growing.
         } // For each timestep.
 
