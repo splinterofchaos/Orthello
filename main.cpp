@@ -28,7 +28,7 @@ Timer gameTimer;
 
 bool showFrameTime = false;
 
-float zRot = 0;
+float zRot = 45;
 
 #include "Screen.h"
 
@@ -53,13 +53,14 @@ struct Player
     {
         glPushMatrix();
         glTranslatef( s.x(), s.y(), 100 );
-        glRotatef( 90, 1, 0, 0 );
+        glRotatef( -zRot, 0, 0, 1 );
+        glRotatef(    90, 1, 0, 0 );
 
         Vector<float,2> tmpVerts[] = {
-            vector( -50.f, -50.f ),
-            vector(  50.f, -50.f ),
-            vector(  50.f,  50.f ),
-            vector( -50.f,  50.f )
+            vector( -50.f,   0.f ),
+            vector(  50.f,   0.f ),
+            vector(  50.f, 100.f ),
+            vector( -50.f, 100.f )
         };
 
         Vector<int,2> tmpCoord[] = {
@@ -210,8 +211,8 @@ int main( int, char** )
 
             // Rotate the scene for the next run.
             glLoadIdentity();
-            glRotatef( 45, 1, 0, 0 );
-            glRotatef( 45 + zRot, 0, 0, 1 );
+            glRotatef(   45, 1, 0, 0 );
+            glRotatef( zRot, 0, 0, 1 );
         }
         
         if( paused )
