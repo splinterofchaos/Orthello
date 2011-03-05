@@ -116,7 +116,7 @@ struct Player
         glTranslatef( s.x(), s.y(), z );
 
         glRotatef( -zRotDeg, 0, 0, 1 ); // Face the camera.
-        glRotatef(    90, 1, 0, 0 ); // Stand up so the xy-plane is verticle.
+        glRotatef(       90, 1, 0, 0 ); // Stand up so the xy-plane is vertical.
 
         Vector<float,2> tmpVerts[] = {
             vector( -50.f,   0.f ),
@@ -132,7 +132,7 @@ struct Player
             vector( 0, 1 )
         };
 
-        draw::Verts< Vector<float,2> > verts( tmpVerts, 4 );
+        draw::Verts<   Vector<float,2> > verts( tmpVerts, 4 );
         draw::TexCoords< Vector<int,2> > coords( tmpCoord, img.handle(), 4 );
 
         glColor3f( 1, 1, 1 );
