@@ -44,11 +44,11 @@ struct Player
     static Texture img;
 
     Vector<float,2> s;
-    Platform *plat, *prevPlat;
+    Platform *plat;
 
     Player()
     {
-        plat = prevPlat = 0;
+        plat = 0;
     }
 
     void move( int dt )
@@ -79,6 +79,8 @@ struct Player
                 direction.x( std::cos(zRot)*input.x() - std::sin(zRot)*input.y() );
                 direction.y( std::sin(zRot)*input.x() + std::cos(zRot)*input.y() );
 
+                // Find platform most in the direction the player is facing.
+                Platform* nextPlat = 0;
                 float minAngle = 366;
                 for( size_t i=0; i < plat->adjacents.size(); i++ ) 
                 {
@@ -87,12 +89,12 @@ struct Player
                     float angle = angle_between( direction, d );
                     if( angle < minAngle ) {
                         minAngle = angle;
-                        prevPlat = plat->adjacents[i];
+                        nextPlat = plat->adjacents[i];
                     }
                 }
 
-                if( minAngle < 3.14 / 4 ) {
-                    plat = prevPlat;
+                if( nextPlat && minAngle < 3.14 / 4 ) {
+                    plat = nextPlat;
                     jumpCoolDown = 1000;
                 }
             }
