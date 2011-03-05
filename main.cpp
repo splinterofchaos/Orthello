@@ -28,7 +28,7 @@ Timer gameTimer;
 
 bool showFrameTime = false;
 
-float zRot = 0;
+float zRotDeg = 0;
 
 #include "Screen.h"
 
@@ -78,8 +78,10 @@ struct Player
             {
                 // Input is rotated to match perspective.
                 Vector<float,2> direction;
-                direction.x( std::cos(zRot)*input.x() - std::sin(zRot)*input.y() );
-                direction.y( std::sin(zRot)*input.x() + std::cos(zRot)*input.y() );
+
+                float rotate = -zRotDeg * 3.14f/180.f;
+                direction.x( std::cos(rotate)*input.x() - std::sin(rotate)*input.y() );
+                direction.y( std::sin(rotate)*input.x() + std::cos(rotate)*input.y() );
 
                 // Find platform most in the direction the player is facing.
                 Platform* nextPlat = 0;
@@ -110,9 +112,11 @@ struct Player
             z = plat->height();
 
         glPushMatrix();
+
         glTranslatef( s.x(), s.y(), z );
-        glRotatef( -zRot, 0, 0, 1 );
-        glRotatef(    90, 1, 0, 0 );
+
+        glRotatef( -zRotDeg, 0, 0, 1 ); // Face the camera.
+        glRotatef(    90, 1, 0, 0 ); // Stand up so the xy-plane is verticle.
 
         Vector<float,2> tmpVerts[] = {
             vector( -50.f,   0.f ),
@@ -200,9 +204,9 @@ int main( int, char** )
         for( time += frameTimer.time_ms(); !paused && time >= DT; time -= DT ) 
         {
             if( Keyboard::key_down('q') )
-                zRot += 0.1;
+                zRotDeg += 0.1;
             if( Keyboard::key_down('e') )
-                zRot -= 0.1;
+                zRotDeg -= 0.1;
 
             static bool growing = true;
 
@@ -276,7 +280,7 @@ int main( int, char** )
             // Rotate the scene for the next run.
             glLoadIdentity();
             glRotatef(   45, 1, 0, 0 );
-            glRotatef( zRot, 0, 0, 1 );
+            glRotatef( zRotDeg, 0, 0, 1 );
         }
         
         if( paused )
