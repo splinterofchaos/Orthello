@@ -76,6 +76,7 @@ struct Player
 
             if( magnitude(input) > 0.01f ) 
             {
+                // Input is rotated to match perspective.
                 Vector<float,2> direction;
                 direction.x( std::cos(zRot)*input.x() - std::sin(zRot)*input.y() );
                 direction.y( std::sin(zRot)*input.x() + std::cos(zRot)*input.y() );
@@ -130,6 +131,7 @@ struct Player
         draw::Verts< Vector<float,2> > verts( tmpVerts, 4 );
         draw::TexCoords< Vector<int,2> > coords( tmpCoord, img.handle(), 4 );
 
+        glColor3f( 1, 1, 1 );
         draw::draw( verts, coords );
 
         glPopMatrix();
@@ -237,7 +239,7 @@ int main( int, char** )
                             if( platforms[j].growthLeft )
                                 platforms[j].growthLeft -= 1;
 
-                            const float SCALE = 0.15;
+                            const float SCALE = 0.10;
 
                             // Remove square significantly within another.
                             Square scaledDownI = platforms[i], scaledDownJ = platforms[j];
