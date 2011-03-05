@@ -28,7 +28,7 @@ Timer gameTimer;
 
 bool showFrameTime = false;
 
-float zRot = 45;
+float zRot = 0;
 
 #include "Screen.h"
 
@@ -58,10 +58,6 @@ struct Player
 
         s = plat->s;
 
-        plat->r = 1;
-        plat->g = 0;
-        plat->b = 0;
-
         static int jumpCoolDown = 1000;
         jumpCoolDown -= dt;
 
@@ -80,22 +76,22 @@ struct Player
             if( magnitude(input) > 0.01f ) 
             {
                 Vector<float,2> direction;
-                direction.x( std::cos(-zRot)*input.x() - std::sin(-zRot)*input.y() );
-                direction.y( std::sin(-zRot)*input.x() + std::cos(-zRot)*input.y() );
+                direction.x( std::cos(zRot)*input.x() - std::sin(zRot)*input.y() );
+                direction.y( std::sin(zRot)*input.x() + std::cos(zRot)*input.y() );
 
-                float maxDot = 0;
+                float minAngle = 366;
                 for( size_t i=0; i < plat->adjacents.size(); i++ ) 
                 {
                     Vector<float,2> d = plat->adjacents[i]->s - plat->s;
 
-                    float dot = d * direction;
-                    if( dot > maxDot ) {
-                        maxDot = dot;
+                    float angle = angle_between( direction, d );
+                    if( angle < minAngle ) {
+                        minAngle = angle;
                         prevPlat = plat->adjacents[i];
                     }
                 }
 
-                if( maxDot > 0 ) {
+                if( minAngle < 3.14 / 4 ) {
                     plat = prevPlat;
                     jumpCoolDown = 1000;
                 }
