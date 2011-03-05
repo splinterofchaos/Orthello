@@ -128,8 +128,9 @@ struct Player
         };
 
         draw::Verts< Vector<float,2> > verts( tmpVerts, 4 );
+        draw::TexCoords< Vector<int,2> > coords( tmpCoord, img.handle(), 4 );
 
-        draw::draw( verts );
+        draw::draw( verts, coords );
 
         glPopMatrix();
     }

@@ -59,13 +59,49 @@ class Verts
     }
 };
 
+template< typename V >
+class TexCoords
+{
+    std::vector<V> coords;
+    int texture;
+    
+  public:
+    typedef typename V::value_type type;
+
+    TexCoords( V* data, int texture=0, unsigned int n=4 )
+        : texture( texture )
+    {
+        coords.resize( n );
+        std::copy( data, data+n, coords.begin() );
+    }
+
+    void handle( int tex )
+    {
+        texture = tex;
+    }
+
+    int handle()
+    {
+        return texture;
+    }
+
+    const type* data() const
+    {
+        return coords.begin()->begin();
+    }
+
+    unsigned int count() const
+    {
+        return coords.size();
+    }
+};
+
 // PROTOTYPES
 template< typename V >
 void draw( V verts, GLenum mode=GL_QUADS );
 
-template< typename T, typename U >
-void draw( T* verts, size_t nVerts, int texture, U* coords, 
-           GLenum mode=GL_QUADS );
+template< typename V1, typename V2 >
+void draw( V1 verts, V2 texCoords, GLenum mode=GL_QUADS );
 
 template< typename Iter, typename T >
 Iter loop( Iter begin, Iter end, float radA, float radB );
@@ -82,6 +118,25 @@ void draw( V verts , GLenum mode )
     glDrawArrays( mode, 0, verts.count() );
 
     glDisableClientState( GL_VERTEX_ARRAY );
+}
+
+template< typename V1, typename V2 >
+void draw( V1 verts, V2 texCoords, GLenum mode )
+{
+    glEnable( GL_TEXTURE_2D );
+    glEnableClientState( GL_TEXTURE_COORD_ARRAY );
+
+    if( texCoords.handle() ) {
+        typedef typename V2::type T;
+
+        glBindTexture( GL_TEXTURE_2D, texCoords.handle() );
+        glTexCoordPointer( 2, opengl_traits<T>::GL_TYPE, 0, texCoords.data() );
+    }
+
+    draw( verts, mode );
+
+    glDisableClientState( GL_TEXTURE_COORD_ARRAY );
+    glDisable( GL_TEXTURE_2D );
 }
 
 template< typename T, typename U >
