@@ -56,7 +56,8 @@ struct Player
         if( ! plat )
             return;
 
-        s = plat->s;
+        Vector<float,2> d = plat->s - s;
+        s = s + d/100;
 
         static int jumpCoolDown = 1000;
         jumpCoolDown -= dt;
