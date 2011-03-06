@@ -43,12 +43,15 @@ struct Player
 {
     static Texture img;
 
-    Vector<float,2> s;
-    Platform *plat;
+    Vector<float,3> s;
+    Platform *plat, *prevPlat;
+
+    int jumpCoolDown;
 
     Player()
     {
         plat = 0;
+        jumpCoolDown = 1000;
     }
 
     void move( int dt )
@@ -56,13 +59,9 @@ struct Player
         if( ! plat )
             return;
 
-        Vector<float,2> d = plat->s - s;
-        s = s + d/100;
+        jumpCoolDown = std::max( jumpCoolDown-dt, 0 );
 
-        static int jumpCoolDown = 1000;
-        jumpCoolDown -= dt;
-
-        if( jumpCoolDown < 0 ) {
+        if( jumpCoolDown <= 0 ) {
             Vector<float,2> input( 0, 0 );
 
             if( Keyboard::key_down('w') )
@@ -98,22 +97,24 @@ struct Player
                 }
 
                 if( nextPlat && minAngle < 3.14 / 4 ) {
-                    plat = nextPlat;
+                    prevPlat = plat;
+                    plat     = nextPlat;
                     jumpCoolDown = 1000;
                 }
             }
         }
+
+        Vector<float,2> d2 = plat->s - prevPlat->s;
+        Vector<float,3> s0( prevPlat->s.x(), prevPlat->s.y(), prevPlat->height() );
+        Vector<float,3> d3( d2.x(), d2.y(), plat->height() - prevPlat->height() );
+        s = s0 + d3 * (1000-jumpCoolDown)/1000;
     }
 
     void draw()
     {
-        float z = 0;
-        if( plat )
-            z = plat->height();
-
         glPushMatrix();
 
-        glTranslatef( s.x(), s.y(), z );
+        glTranslatef( s.x(), s.y(), s.z() );
 
         glRotatef( -zRotDeg, 0, 0, 1 ); // Face the camera.
         glRotatef(       90, 1, 0, 0 ); // Stand up so the xy-plane is vertical.
