@@ -41,6 +41,8 @@ Platforms platforms;
 
 struct Player
 {
+    static const int JUMP_COOLDOWN = 1000;
+
     static Texture img;
 
     Vector<float,3> s;
@@ -51,7 +53,7 @@ struct Player
     Player()
     {
         plat = 0;
-        jumpCoolDown = 1000;
+        jumpCoolDown = JUMP_COOLDOWN;
     }
 
     void move( int dt )
@@ -99,7 +101,7 @@ struct Player
                 if( nextPlat && minAngle < 3.14 / 4 ) {
                     prevPlat = plat;
                     plat     = nextPlat;
-                    jumpCoolDown = 1000;
+                    jumpCoolDown = JUMP_COOLDOWN;
                 }
             }
         }
@@ -107,7 +109,7 @@ struct Player
         Vector<float,2> d2 = plat->s - prevPlat->s;
         Vector<float,3> s0( prevPlat->s.x(), prevPlat->s.y(), prevPlat->height() );
         Vector<float,3> d3( d2.x(), d2.y(), plat->height() - prevPlat->height() );
-        s = s0 + d3 * (1000-jumpCoolDown)/1000;
+        s = s0 + d3 * (JUMP_COOLDOWN-jumpCoolDown)/JUMP_COOLDOWN;
     }
 
     void draw()
