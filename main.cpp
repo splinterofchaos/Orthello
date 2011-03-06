@@ -41,7 +41,7 @@ Platforms platforms;
 
 struct Player
 {
-    static const int JUMP_COOLDOWN = 1000;
+    static const int JUMP_COOLDOWN = 500;
 
     static Texture img;
 
@@ -106,10 +106,15 @@ struct Player
             }
         }
 
+        float t = JUMP_COOLDOWN - jumpCoolDown;
+        float dz = plat->height() - prevPlat->height();
+
         Vector<float,2> d2 = plat->s - prevPlat->s;
         Vector<float,3> s0( prevPlat->s.x(), prevPlat->s.y(), prevPlat->height() );
-        Vector<float,3> d3( d2.x(), d2.y(), plat->height() - prevPlat->height() );
-        s = s0 + d3 * (JUMP_COOLDOWN-jumpCoolDown)/JUMP_COOLDOWN;
+        Vector<float,3> d3( d2.x(), d2.y(), dz ); 
+
+        s = s0 + d3 * ( t / JUMP_COOLDOWN );
+        s.z() += 100*std::sin(3.14*t/JUMP_COOLDOWN);
     }
 
     void draw()
