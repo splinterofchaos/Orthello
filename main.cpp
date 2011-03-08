@@ -119,13 +119,18 @@ struct Player
 
     void draw()
     {
+        // The image for the player is only the left side so the strategy is:
+        // Draw the left, then rotate the perspective and draw it again.
+
         glPushMatrix();
 
         glTranslatef( s.x(), s.y(), s.z() );
 
         glRotatef( -zRotDeg, 0, 0, 1 ); // Face the camera.
-        glRotatef(       90, 1, 0, 0 ); // Stand up so the xy-plane is vertical.
+        glRotatef(       90, 1, 0, 0 ); // Stand up so the XY-plane is vertical.
 
+        // Since X and Y are verticle now, ignore Z.
+        // Remember, this is only for the left side.
         Vector<float,2> tmpVerts[] = {
             vector( -10.f,  0.f ),
             vector(   0.f,  0.f ),
@@ -144,10 +149,9 @@ struct Player
         draw::TexCoords< Vector<int,2> > coords( tmpCoord, img.handle(), 4 );
 
         glColor3f( 1, 1, 1 );
+
         draw::draw( verts, coords );
-        
-        glRotatef( 180, 0, 1, 0 );
-        
+        glRotatef( 180, 0, 1, 0 ); // Flip to the other side.
         draw::draw( verts, coords );
 
         glPopMatrix();
