@@ -114,7 +114,9 @@ struct Player
         Vector<float,3> d3( d2.x(), d2.y(), dz ); 
 
         s = s0 + d3 * ( t / JUMP_COOLDOWN );
-        s.z() += 75*std::sin(3.14*t/JUMP_COOLDOWN);
+
+        float tmp = std::sin(3.14*t/JUMP_COOLDOWN);
+        s.z() += 75 * std::sqrt(tmp);
     }
 
     void draw()
