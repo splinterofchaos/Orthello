@@ -114,7 +114,7 @@ struct Player
         Vector<float,3> d3( d2.x(), d2.y(), dz ); 
 
         s = s0 + d3 * ( t / JUMP_COOLDOWN );
-        s.z() += 100*std::sin(3.14*t/JUMP_COOLDOWN);
+        s.z() += 75*std::sin(3.14*t/JUMP_COOLDOWN);
     }
 
     void draw()
@@ -127,23 +127,27 @@ struct Player
         glRotatef(       90, 1, 0, 0 ); // Stand up so the xy-plane is vertical.
 
         Vector<float,2> tmpVerts[] = {
-            vector( -50.f,   0.f ),
-            vector(  50.f,   0.f ),
-            vector(  50.f, 100.f ),
-            vector( -50.f, 100.f )
+            vector( -10.f,  0.f ),
+            vector(   0.f,  0.f ),
+            vector(   0.f, 50.f ),
+            vector( -10.f, 50.f ),
         };
 
         Vector<int,2> tmpCoord[] = {
-            vector( 0, 0 ),
-            vector( 1, 0 ),
+            vector( 0, 1 ),
             vector( 1, 1 ),
-            vector( 0, 1 )
+            vector( 1, 0 ),
+            vector( 0, 0 )
         };
 
         draw::Verts<   Vector<float,2> > verts( tmpVerts, 4 );
         draw::TexCoords< Vector<int,2> > coords( tmpCoord, img.handle(), 4 );
 
         glColor3f( 1, 1, 1 );
+        draw::draw( verts, coords );
+        
+        glRotatef( 180, 0, 1, 0 );
+        
         draw::draw( verts, coords );
 
         glPopMatrix();
@@ -173,7 +177,7 @@ int main( int, char** )
 
     Player player;
 
-    Player::img.load( "art/Orbital.bmp" );
+    Player::img.load( "art/Wizzard.bmp" );
 
     Timer frameTimer;
     while( quit == false )
