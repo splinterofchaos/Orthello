@@ -247,7 +247,13 @@ int main( int, char** )
                 {
                     for( size_t j=i+1; j < platforms.size(); j++ )
                     {
-                        if( square_square_collision(platforms[i], platforms[j]) )
+                        Square scaledI = platforms[i], scaledJ = platforms[j];
+
+                        // We want platforms that are very close to count as
+                        // adjacent.
+                        scaledI.scale *= 1.1; scaledJ.scale *= 1.1;
+
+                        if( square_square_collision(scaledI, scaledJ) )
                         {
                             // If we stopped growing,
                             if( !growing ) {
@@ -261,15 +267,14 @@ int main( int, char** )
                             if( platforms[j].growthLeft )
                                 platforms[j].growthLeft -= 1;
 
-                            const float SCALE = 0.10;
+                            const float SCALE = 0.1;
 
                             // Remove square significantly within another.
-                            Square scaledDownI = platforms[i], scaledDownJ = platforms[j];
-                            scaledDownI.scale *= SCALE; scaledDownJ.scale *= SCALE;
+                            scaledI.scale *= SCALE; scaledJ.scale *= SCALE;
 
-                            if( square_square_collision(scaledDownI, platforms[j]) )
+                            if( square_square_collision(scaledI, platforms[j]) )
                                 platforms.erase( platforms.begin() + i );
-                            else if( square_square_collision(scaledDownJ, platforms[i]) )
+                            else if( square_square_collision(scaledJ, platforms[i]) )
                                 platforms.erase( platforms.begin() + j );
                         }
                     } // For platforms[j].
