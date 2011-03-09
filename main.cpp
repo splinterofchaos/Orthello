@@ -173,11 +173,11 @@ int main( int, char** )
         return 1;
     make_sdl_gl_window( 600, 600 );
 
-    for( int i=0; i < 300; i++ )
+    for( int i=0; i < 1000; i++ )
     {
         Vector<float,2> pos;
-        pos.x( random(-400, 400) );
-        pos.y( random(-400, 400) );
+        pos.x( random(-1000, 1000) );
+        pos.y( random(-1000, 1000) );
         platforms.push_back( Platform( pos ) );
     }
 
@@ -295,10 +295,14 @@ int main( int, char** )
         if( lastUpdate + IDEAL_FRAME_TIME/2 <= realTimer.time_ms() ) {
             update_screen();
 
-            // Rotate the scene for the next run.
             glLoadIdentity();
-            glRotatef(   45, 1, 0, 0 );
+
+            // Rotate the scene for the next run.
+            glRotatef(      45, 1, 0, 0 );
             glRotatef( zRotDeg, 0, 0, 1 );
+
+            // Center the camera on the player.
+            glTranslatef( -player.s.x(), -player.s.y(), 0 );
         }
         
         if( paused )
