@@ -3,7 +3,11 @@
 
 #include <SDL/SDL.h>
 
-bool resize_window( float w, float h )
+int   Screen::height = 600;
+int   Screen::width  = 600;
+float Screen::scale  = 1;
+
+bool resize_window( float w, float h, float scale )
 {
     if( !SDL_SetVideoMode(w, h, 32, SDL_OPENGL|SDL_RESIZABLE) )
         return false;
@@ -11,6 +15,10 @@ bool resize_window( float w, float h )
     glViewport( 0, 0, w, h );
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
+
+    w *= scale;
+    h *= scale;
+
     glOrtho( -w/2, w/2, h/2, -h/2, -1000, 1000 );
     glMatrixMode( GL_MODELVIEW );
 

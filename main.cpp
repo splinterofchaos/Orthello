@@ -186,7 +186,7 @@ int main( int, char** )
 
     if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 )
         return 1;
-    make_sdl_gl_window( 600, 600 );
+    make_sdl_gl_window( Screen::width, Screen::height );
 
     for( int i=0; i < 1000; i++ )
     {
@@ -217,8 +217,9 @@ int main( int, char** )
 
               case SDL_VIDEORESIZE:
                 float w=event.resize.w, h=event.resize.h;
-                resize_window( w, h );
+                Screen::width = w; Screen::height = h;
                 break;
+                // The window will be resized later.
             }
         }
 
@@ -231,7 +232,7 @@ int main( int, char** )
             quit = true;
 
         float DT = IDEAL_FRAME_TIME * ( 1.f / 4.f );
-        //
+
         // For each time-step:
         static int time = 0;
         for( time += frameTimer.time_ms(); !paused && time >= DT; time -= DT ) 
@@ -303,6 +304,9 @@ int main( int, char** )
                 player.move( DT );
             }
         } // For each timestep.
+
+        if( player.plat )
+            resize_window( Screen::width, Screen::height, player.plat->scale / 100 );
 
         for( size_t i=0; i < platforms.size(); i++ )
             platforms[i].draw();

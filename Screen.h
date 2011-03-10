@@ -1,7 +1,12 @@
 
 #include <GL/gl.h>
 
-bool resize_window( float w, float h );
+struct Screen {
+    static int height, width;
+    static float scale;
+};
+
+bool resize_window( float w, float h, float scale=1 );
 
 GLenum init_gl( int w, int h );
 
