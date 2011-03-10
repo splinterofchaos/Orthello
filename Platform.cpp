@@ -35,10 +35,10 @@ void Platform::draw()
     };
 
     Vec3 wall[] = {
-        Vec3( -scale, -scale,     z ),
-        Vec3( -scale, -scale, -1000 ),
-        Vec3( -scale,  scale, -1000 ),
-        Vec3( -scale,  scale,     z )
+        Vec3( -scale, -scale,    z ),
+        Vec3( -scale, -scale, -100 ),
+        Vec3( -scale,  scale, -100 ),
+        Vec3( -scale,  scale,    z )
     };
 
     draw::Verts< Vec3 > verts( square, 4 );

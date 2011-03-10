@@ -42,6 +42,8 @@ class Player : public CircleActor
     void collide_with( CircleActor& collider );
 
     Color color();
+
+    float jump_completion() const;
 };
 
 struct Player2 : public Player

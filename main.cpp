@@ -46,8 +46,8 @@ struct Player
     Vector<float,3> s;
     Platform *plat, *prevPlat;
 
-    int jumpCoolDown;
-    int maxJumpCoolDown;
+    float jumpCoolDown;
+    float maxJumpCoolDown;
 
     Player()
     {
@@ -65,7 +65,7 @@ struct Player
         if( ! prevPlat )
             prevPlat = plat;
 
-        jumpCoolDown = std::max( jumpCoolDown-dt, 0 );
+        jumpCoolDown = std::max( jumpCoolDown-dt, 0.f );
 
         if( jumpCoolDown <= 0 ) {
             Vector<float,2> input( 0, 0 );
@@ -112,7 +112,6 @@ struct Player
             }
         }
 
-        float t      = maxJumpCoolDown - jumpCoolDown;
         float deltaZ = plat->height() - prevPlat->height();
         float dz     = plat->height() / prevPlat->height();
 
@@ -120,9 +119,9 @@ struct Player
         Vector<float,3> s0( prevPlat->s.x(), prevPlat->s.y(), prevPlat->height() );
         Vector<float,3> d3( d2.x(), d2.y(), deltaZ ); 
 
-        s = s0 + d3 * ( t / maxJumpCoolDown );
+        s = s0 + d3 * jump_completion();
 
-        float tmp = std::sin(3.14*t/maxJumpCoolDown);
+        float tmp = std::sin( 3.14 * jump_completion() );
         s.z() += 75 * dz * std::sqrt(tmp);
     }
 
@@ -172,6 +171,11 @@ struct Player
         draw::draw( verts, coords );
 
         glPopMatrix();
+    }
+
+    float jump_completion() const
+    {
+        return (maxJumpCoolDown - jumpCoolDown) / maxJumpCoolDown;
     }
 };
 Texture Player::img;
@@ -302,11 +306,15 @@ int main( int, char** )
             else
             {
                 player.move( DT );
+
+                if( player.plat ) {
+                    const float SCALE_FACTOR = 0.03;
+                    Screen::scale = player.prevPlat->scale + (player.plat->scale-player.prevPlat->scale)*player.jump_completion();
+                    Screen::scale *= SCALE_FACTOR;
+                    resize_window( Screen::width, Screen::height, Screen::scale );
+                }
             }
         } // For each timestep.
-
-        if( player.plat )
-            resize_window( Screen::width, Screen::height, player.plat->scale / 100 );
 
         for( size_t i=0; i < platforms.size(); i++ )
             platforms[i].draw();
