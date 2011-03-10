@@ -53,14 +53,16 @@ struct Player
     {
         plat = 0;
         prevPlat = 0;
-        maxJumpCoolDown = 1000;
+        maxJumpCoolDown = 800;
         jumpCoolDown = maxJumpCoolDown;
     }
 
     void move( int dt )
     {
-        if( ! plat )
+        if( ! plat ) {
+            s.z( 1000 );
             return;
+        }
 
         if( ! prevPlat )
             prevPlat = plat;
@@ -192,11 +194,12 @@ int main( int, char** )
         return 1;
     make_sdl_gl_window( Screen::width, Screen::height );
 
-    for( int i=0; i < 1000; i++ )
+    float w = 1000; // The width of one side of the area to spawn plats.
+    for( int i=0; i < w/2; i++ )
     {
         Vector<float,2> pos;
-        pos.x( random(-1000, 1000) );
-        pos.y( random(-1000, 1000) );
+        pos.x( random(-w/2, w/2) );
+        pos.y( random(-w/2, w/2) );
         platforms.push_back( Platform( pos ) );
     }
 
@@ -308,7 +311,7 @@ int main( int, char** )
                 player.move( DT );
 
                 if( player.plat ) {
-                    const float SCALE_FACTOR = 0.03;
+                    const float SCALE_FACTOR = 0.02;
                     Screen::scale = player.prevPlat->scale + (player.plat->scale-player.prevPlat->scale)*player.jump_completion();
                     Screen::scale *= SCALE_FACTOR;
                     resize_window( Screen::width, Screen::height, Screen::scale );
@@ -332,11 +335,12 @@ int main( int, char** )
             // Rotate the scene for the next run.
             glRotatef(      45, 1, 0, 0 );
             glRotatef( zRotDeg, 0, 0, 1 );
+
             float z;
-            if( player.plat )
+            if( player.plat && player.prevPlat  )
                 z = player.prevPlat->s.z() + (player.plat->s.z()-player.prevPlat->s.z())*player.jump_completion();
             else
-                z = 500;
+                z = player.s.z();
 
             // Center the camera on the player.
             glTranslatef( -player.s.x(), -player.s.y(), -z );

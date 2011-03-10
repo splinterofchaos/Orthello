@@ -19,7 +19,7 @@ bool resize_window( float w, float h, float scale )
     w *= scale;
     h *= scale;
 
-    glOrtho( -w/2, w/2, h/2, -h/2, -1000, 1000 );
+    glOrtho( -w/2, w/2, h/2, -h/2, -10000, 10000 );
     glMatrixMode( GL_MODELVIEW );
 
     return true;
