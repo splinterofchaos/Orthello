@@ -332,9 +332,14 @@ int main( int, char** )
             // Rotate the scene for the next run.
             glRotatef(      45, 1, 0, 0 );
             glRotatef( zRotDeg, 0, 0, 1 );
+            float z;
+            if( player.plat )
+                z = player.prevPlat->s.z() + (player.plat->s.z()-player.prevPlat->s.z())*player.jump_completion();
+            else
+                z = 500;
 
             // Center the camera on the player.
-            glTranslatef( -player.s.x(), -player.s.y(), 0 );
+            glTranslatef( -player.s.x(), -player.s.y(), -z );
         }
         
         if( paused )
