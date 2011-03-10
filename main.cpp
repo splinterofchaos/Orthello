@@ -41,25 +41,29 @@ Platforms platforms;
 
 struct Player
 {
-    static const int JUMP_COOLDOWN = 500;
-
     static Texture img;
 
     Vector<float,3> s;
     Platform *plat, *prevPlat;
 
     int jumpCoolDown;
+    int maxJumpCoolDown;
 
     Player()
     {
         plat = 0;
-        jumpCoolDown = JUMP_COOLDOWN;
+        prevPlat = 0;
+        maxJumpCoolDown = 1000;
+        jumpCoolDown = maxJumpCoolDown;
     }
 
     void move( int dt )
     {
         if( ! plat )
             return;
+
+        if( ! prevPlat )
+            prevPlat = plat;
 
         jumpCoolDown = std::max( jumpCoolDown-dt, 0 );
 
@@ -101,22 +105,25 @@ struct Player
                 if( nextPlat && minAngle < 3.14 / 4 ) {
                     prevPlat = plat;
                     plat     = nextPlat;
-                    jumpCoolDown = JUMP_COOLDOWN;
+
+                    maxJumpCoolDown = 500 * plat->height() / prevPlat->height();
+                    jumpCoolDown = maxJumpCoolDown;
                 }
             }
         }
 
-        float t = JUMP_COOLDOWN - jumpCoolDown;
-        float dz = plat->height() - prevPlat->height();
+        float t      = maxJumpCoolDown - jumpCoolDown;
+        float deltaZ = plat->height() - prevPlat->height();
+        float dz     = plat->height() / prevPlat->height();
 
         Vector<float,2> d2 = plat->s - prevPlat->s;
         Vector<float,3> s0( prevPlat->s.x(), prevPlat->s.y(), prevPlat->height() );
-        Vector<float,3> d3( d2.x(), d2.y(), dz ); 
+        Vector<float,3> d3( d2.x(), d2.y(), deltaZ ); 
 
-        s = s0 + d3 * ( t / JUMP_COOLDOWN );
+        s = s0 + d3 * ( t / maxJumpCoolDown );
 
-        float tmp = std::sin(3.14*t/JUMP_COOLDOWN);
-        s.z() += 75 * std::sqrt(tmp);
+        float tmp = std::sin(3.14*t/maxJumpCoolDown);
+        s.z() += 75 * dz * std::sqrt(tmp);
     }
 
     void draw()
@@ -138,22 +145,30 @@ struct Player
             vector(   0.f,  0.f ),
             vector(   0.f, 50.f ),
             vector( -10.f, 50.f ),
+
+            vector(  10.f,  0.f ),
+            vector(   0.f,  0.f ),
+            vector(   0.f, 50.f ),
+            vector(  10.f, 50.f ),
         };
 
         Vector<int,2> tmpCoord[] = {
             vector( 0, 1 ),
             vector( 1, 1 ),
             vector( 1, 0 ),
-            vector( 0, 0 )
+            vector( 0, 0 ),
+
+            vector( 0, 1 ),
+            vector( 1, 1 ),
+            vector( 1, 0 ),
+            vector( 0, 0 ),
         };
 
-        draw::Verts<   Vector<float,2> > verts( tmpVerts, 4 );
-        draw::TexCoords< Vector<int,2> > coords( tmpCoord, img.handle(), 4 );
+        draw::Verts<   Vector<float,2> > verts( tmpVerts, 8 );
+        draw::TexCoords< Vector<int,2> > coords( tmpCoord, img.handle(), 8 );
 
         glColor3f( 1, 1, 1 );
 
-        draw::draw( verts, coords );
-        glRotatef( 180, 0, 1, 0 ); // Flip to the other side.
         draw::draw( verts, coords );
 
         glPopMatrix();

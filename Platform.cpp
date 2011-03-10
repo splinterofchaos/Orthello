@@ -77,5 +77,5 @@ void Platform::add_adjacent( Platform* p )
 
 float Platform::height()
 {
-    return scale / 2;
+    return scale * scale / 30;
 }
