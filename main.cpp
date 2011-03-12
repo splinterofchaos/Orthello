@@ -194,7 +194,7 @@ int main( int, char** )
         return 1;
     make_sdl_gl_window( Screen::width, Screen::height );
 
-    float w = 1000; // The width of one side of the area to spawn plats.
+    int w = 1000; // The width of one side of the area to spawn plats.
     for( int i=0; i < w/2; i++ )
     {
         Vector<float,2> pos;
