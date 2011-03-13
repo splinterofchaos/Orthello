@@ -9,9 +9,6 @@ float Screen::scale  = 1;
 
 bool resize_window( float w, float h, float scale )
 {
-    if( !SDL_SetVideoMode(w, h, 32, SDL_OPENGL|SDL_RESIZABLE) )
-        return false;
-
     glViewport( 0, 0, w, h );
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();
@@ -63,6 +60,9 @@ void set_vsync( int interval )
 
 bool make_sdl_gl_window( int w, int h )
 {
+    if( !SDL_SetVideoMode(w, h, 32, SDL_OPENGL|SDL_RESIZABLE) )
+        return false;
+
     if( ! resize_window(w,h) )
         return false;
     init_gl( w, h );
