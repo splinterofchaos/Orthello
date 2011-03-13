@@ -53,7 +53,7 @@ bool Texture::load( const std::string& filaname )
     ref = get_ref();
 
     // If this Item already exists, and is loaded, we're all set.
-    if( get_ref() != -1u && registery[ref].refCount++ != 0 )
+    if( get_ref() != -1u && ref < registery.size() && registery[ref].refCount++ != 0 )
         return true;
 
     // Otherwise, make it.
