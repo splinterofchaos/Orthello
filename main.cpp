@@ -5,6 +5,7 @@
 
 #include "Draw.h"
 #include "Texture.h"
+#include "Screen.h"
 
 #include "Keyboard.h"
 #include "Timer.h"
@@ -28,9 +29,7 @@ Timer gameTimer;
 
 bool showFrameTime = false;
 
-float zRotDeg = 0;
-
-#include "Screen.h"
+float zRotDeg = 40;
 
 void keyboard_events()
 {
