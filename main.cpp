@@ -1,7 +1,10 @@
  
 // Local includes.
 #include "Actor.h"
+#include "Player.h"
 #include "Platform.h"
+
+#include "World.h"
 
 #include "Draw.h"
 #include "Texture.h"
@@ -29,157 +32,12 @@ Timer gameTimer;
 
 bool showFrameTime = false;
 
-float zRotDeg = 40;
-
 void keyboard_events()
 {
 }
 
 typedef std::vector< Platform > Platforms;
 Platforms platforms;
-
-struct Player
-{
-    static Texture img;
-
-    Vector<float,3> s;
-    Platform *plat, *prevPlat;
-
-    float jumpCoolDown;
-    float maxJumpCoolDown;
-
-    Player()
-    {
-        plat = 0;
-        prevPlat = 0;
-        maxJumpCoolDown = 800;
-        jumpCoolDown = maxJumpCoolDown;
-    }
-
-    void move( int dt )
-    {
-        if( ! plat ) {
-            s.z( 1000 );
-            return;
-        }
-
-        if( ! prevPlat )
-            prevPlat = plat;
-
-        jumpCoolDown = std::max( jumpCoolDown-dt, 0.f );
-
-        if( jumpCoolDown <= 0 ) {
-            Vector<float,2> input( 0, 0 );
-
-            if( Keyboard::key_down('w') )
-                input.y() += -1;
-            if( Keyboard::key_down('s') )
-                input.y() +=  1;
-            if( Keyboard::key_down('a') )
-                input.x() += -1;
-            if( Keyboard::key_down('d') )
-                input.x() +=  1;
-
-            if( magnitude(input) > 0.01f ) 
-            {
-                // Input is rotated to match perspective.
-                Vector<float,2> direction;
-
-                float rotate = -zRotDeg * 3.14f/180.f;
-                direction.x( std::cos(rotate)*input.x() - std::sin(rotate)*input.y() );
-                direction.y( std::sin(rotate)*input.x() + std::cos(rotate)*input.y() );
-
-                // Find platform most in the direction the player is facing.
-                Platform* nextPlat = 0;
-                float minAngle = 366;
-                for( size_t i=0; i < plat->adjacents.size(); i++ ) 
-                {
-                    Vector<float,2> d = plat->adjacents[i]->s - plat->s;
-
-                    float angle = angle_between( direction, d );
-                    if( angle < minAngle ) {
-                        minAngle = angle;
-                        nextPlat = plat->adjacents[i];
-                    }
-                }
-
-                if( nextPlat && minAngle < 3.14 / 4 ) {
-                    prevPlat = plat;
-                    plat     = nextPlat;
-
-                    maxJumpCoolDown = 500 * plat->height() / prevPlat->height();
-                    jumpCoolDown = maxJumpCoolDown;
-                }
-            }
-        }
-
-        float deltaZ = plat->height() - prevPlat->height();
-        float dz     = plat->height() / prevPlat->height();
-
-        Vector<float,2> d2 = plat->s - prevPlat->s;
-        Vector<float,3> s0( prevPlat->s.x(), prevPlat->s.y(), prevPlat->height() );
-        Vector<float,3> d3( d2.x(), d2.y(), deltaZ ); 
-
-        s = s0 + d3 * jump_completion();
-
-        float tmp = std::sin( 3.14 * jump_completion() );
-        s.z() += 75 * dz * std::sqrt(tmp);
-    }
-
-    void draw()
-    {
-        // The image for the player is only the left side so the strategy is:
-        // Draw the left, then rotate the perspective and draw it again.
-
-        glPushMatrix();
-
-        glTranslatef( s.x(), s.y(), s.z() );
-
-        glRotatef( -zRotDeg, 0, 0, 1 ); // Face the camera.
-        glRotatef(       90, 1, 0, 0 ); // Stand up so the XY-plane is vertical.
-
-        // Since X and Y are verticle now, ignore Z.
-        // Remember, this is only for the left side.
-        Vector<float,2> tmpVerts[] = {
-            vector( -10.f,  0.f ),
-            vector(   0.f,  0.f ),
-            vector(   0.f, 50.f ),
-            vector( -10.f, 50.f ),
-
-            vector(  10.f,  0.f ),
-            vector(   0.f,  0.f ),
-            vector(   0.f, 50.f ),
-            vector(  10.f, 50.f ),
-        };
-
-        Vector<int,2> tmpCoord[] = {
-            vector( 0, 1 ),
-            vector( 1, 1 ),
-            vector( 1, 0 ),
-            vector( 0, 0 ),
-
-            vector( 0, 1 ),
-            vector( 1, 1 ),
-            vector( 1, 0 ),
-            vector( 0, 0 ),
-        };
-
-        draw::Verts<   Vector<float,2> > verts( tmpVerts, 8 );
-        draw::TexCoords< Vector<int,2> > coords( tmpCoord, img.handle(), 8 );
-
-        glColor3f( 1, 1, 1 );
-
-        draw::draw( verts, coords );
-
-        glPopMatrix();
-    }
-
-    float jump_completion() const
-    {
-        return (maxJumpCoolDown - jumpCoolDown) / maxJumpCoolDown;
-    }
-};
-Texture Player::img;
 
 int main( int, char** )
 {
@@ -244,9 +102,9 @@ int main( int, char** )
         for( time += frameTimer.time_ms(); !paused && time >= DT; time -= DT ) 
         {
             if( Keyboard::key_down('q') )
-                zRotDeg += 0.1;
+                World::zRotDeg += 0.1;
             if( Keyboard::key_down('e') )
-                zRotDeg -= 0.1;
+                World::zRotDeg -= 0.1;
 
             static bool growing = true;
 
@@ -332,8 +190,8 @@ int main( int, char** )
             glLoadIdentity();
 
             // Rotate the scene for the next run.
-            glRotatef(      45, 1, 0, 0 );
-            glRotatef( zRotDeg, 0, 0, 1 );
+            glRotatef(             45, 1, 0, 0 );
+            glRotatef( World::zRotDeg, 0, 0, 1 );
 
             float z;
             if( player.plat && player.prevPlat  )

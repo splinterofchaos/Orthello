@@ -4,188 +4,139 @@
 #include "Keyboard.h"
 #include "Draw.h"
 
-Texture Player::shield;
-Texture Player::body;
+#include "World.h"
 
-Player::WeakPlayerPtr Player::original;
-Player::WeakPlayerPtr Player::copy;
+Texture Player::img;
 
-Player::Player( const Player::vector_type& position )
-    : CircleActor( position ), isVisible( true )
+Player::Player()
 {
-    isAttractor = true;
-    invinsible = false;
+    plat = 0;
+    prevPlat = 0;
+    maxJumpCoolDown = 800;
+    jumpCoolDown = maxJumpCoolDown;
 }
 
 void Player::move( float dt )
 {
-    const value_type ACC   = 0.012;
+    if( ! plat ) {
+        s.z( 1000 );
+        return;
+    }
 
-    // TODO: The value of SPEED seems not to affect this function. Why?
-    const value_type SPEED = 0.0000002;
+    if( ! prevPlat )
+        prevPlat = plat;
 
-    if( Keyboard::key_down('a') || Keyboard::key_down( Keyboard::LEFT  ) )
-        a.x( a.x() - ACC );
-    if( Keyboard::key_down('d') || Keyboard::key_down( Keyboard::RIGHT ) )
-        a.x( a.x() + ACC );
-    if( Keyboard::key_down('w') || Keyboard::key_down( Keyboard::UP    ) )
-        a.y( a.y() - ACC );
-    if( Keyboard::key_down('s') || Keyboard::key_down( Keyboard::DOWN  ) )
-        a.y( a.y() + ACC );
+    jumpCoolDown = std::max( jumpCoolDown-dt, 0.f );
 
-    if( magnitude(a) > ACC )
-        magnitude( a, ACC );
+    if( jumpCoolDown <= 0 ) {
+        Vector<float,2> input( 0, 0 );
 
-    // Used in Player::mass called by CircleActor::move.
-    moreGravity = Keyboard::key_down(' ');;
+        if( Keyboard::key_down('w') )
+            input.y() += -1;
+        if( Keyboard::key_down('s') )
+            input.y() +=  1;
+        if( Keyboard::key_down('a') )
+            input.x() += -1;
+        if( Keyboard::key_down('d') )
+            input.x() +=  1;
 
-    if( moreGravity )
-        a *= 1.05;
+        if( magnitude(input) > 0.01f ) 
+        {
+            // Input is rotated to match perspective.
+            Vector<float,2> direction;
 
-    CircleActor::move( dt, SPEED );
+            float rotate = -World::zRotDeg * 3.14f/180.f;
+            direction.x( std::cos(rotate)*input.x() - std::sin(rotate)*input.y() );
+            direction.y( std::sin(rotate)*input.x() + std::cos(rotate)*input.y() );
 
-    //v *= 0.2;
-    a *= 0.9;
+            // Find platform most in the direction the player is facing.
+            Platform* nextPlat = 0;
+            float minAngle = 366;
+            for( size_t i=0; i < plat->adjacents.size(); i++ ) 
+            {
+                Vector<float,2> d = plat->adjacents[i]->s - plat->s;
+
+                float angle = angle_between( direction, d );
+                if( angle < minAngle ) {
+                    minAngle = angle;
+                    nextPlat = plat->adjacents[i];
+                }
+            }
+
+            if( nextPlat && minAngle < 3.14 / 4 ) {
+                prevPlat = plat;
+                plat     = nextPlat;
+
+                maxJumpCoolDown = 500 * plat->height() / prevPlat->height();
+                jumpCoolDown = maxJumpCoolDown;
+            }
+        }
+    }
+
+    float deltaZ = plat->height() - prevPlat->height();
+    float dz     = plat->height() / prevPlat->height();
+
+    Vector<float,2> d2 = plat->s - prevPlat->s;
+    Vector<float,3> s0( prevPlat->s.x(), prevPlat->s.y(), prevPlat->height() );
+    Vector<float,3> d3( d2.x(), d2.y(), deltaZ ); 
+
+    s = s0 + d3 * jump_completion();
+
+    float tmp = std::sin( 3.14 * jump_completion() );
+    s.z() += 75 * dz * std::sqrt(tmp);
 }
+
 
 void Player::draw()
 {
-    if( !isVisible )
-        return;
+    // The image for the player is only the left side so the strategy is:
+    // Draw the left, then rotate the perspective and draw it again.
 
-    glTranslatef( s.x(), s.y(), 0 );
+    glPushMatrix();
 
-    float shieldVerts[] = { 
-        -radius(), -radius(),
-         radius(), -radius(),
-         radius(),  radius(),        
-        -radius(),  radius(),
+    glTranslatef( s.x(), s.y(), s.z() );
+
+    glRotatef( -World::zRotDeg, 0, 0, 1 ); // Face the camera.
+    glRotatef( 90, 1, 0, 0 ); // Stand up so the XY-plane is vertical.
+
+    // Since X and Y are verticle now, ignore Z.
+    // Remember, this is only for the left side.
+    Vector<float,2> tmpVerts[] = {
+        vector( -10.f,  0.f ),
+        vector(   0.f,  0.f ),
+        vector(   0.f, 50.f ),
+        vector( -10.f, 50.f ),
+
+        vector(  10.f,  0.f ),
+        vector(   0.f,  0.f ),
+        vector(   0.f, 50.f ),
+        vector(  10.f, 50.f ),
     };
 
-    float bodyVerts[] = { 
-        -radius()/2, -radius()/2,
-         radius()/2, -radius()/2,
-         radius()/2,  radius()/2,        
-        -radius()/2,  radius()/2,
+    Vector<int,2> tmpCoord[] = {
+        vector( 0, 1 ),
+        vector( 1, 1 ),
+        vector( 1, 0 ),
+        vector( 0, 0 ),
+
+        vector( 0, 1 ),
+        vector( 1, 1 ),
+        vector( 1, 0 ),
+        vector( 0, 0 ),
     };
 
-    int texCoords[] = {
-        0, 0,
-        1, 0,
-        1, 1, 
-        0, 1
-    };
+    draw::Verts<   Vector<float,2> > verts( tmpVerts, 8 );
+    draw::TexCoords< Vector<int,2> > coords( tmpCoord, img.handle(), 8 );
 
-    Color c = color();
-    glColor3f( c.r(), c.g(), c.b() );
+    glColor3f( 1, 1, 1 );
 
-    // Shield MUST be drawn before body. Body overwrites shield.
-    draw::draw( shieldVerts, 4, shield.handle(), texCoords );
-    draw::draw( bodyVerts,   4, body.handle(),   texCoords );
+    draw::draw( verts, coords );
 
-    glLoadIdentity();
-
-    SharedPlayerPtr copy = Player::copy.lock();
-    if( this==original.lock().get() && copy ) {
-        vector_type connectingLine[] = { s, copy->s };
-
-        c = ( c + copy->color() ) / 2;
-        glColor3f( c.r(), c.g(), c.b() );
-
-        // This draws a line, but the texture makes it more faint.
-        draw::draw (
-            &connectingLine[0][0], 2, 
-            body.handle(), texCoords, GL_LINES 
-        );
-    }
-
-    glLoadIdentity();
+    glPopMatrix();
 }
 
-int Player::score_value()
+
+float Player::jump_completion() const
 {
-    return 0;
-}
-
-Player::value_type Player::radius() const 
-{
-    return RADIUS / (1 + 0.5*!copy.expired()) * Arena::scale;
-}
-
-Player::value_type Player::mass() const
-{
-    value_type g;
-    if( moreGravity )
-        g = 100;
-    else
-        g = DEFULAT_MASS;
-
-    if( !copy.expired() )
-        return g / 2;
-    else
-        return g;
-}
-
-void Player::collide_with( CircleActor& collider )
-{
-    if( !invinsible && collider.isDeadly ) {
-        deleteMe = true;
-
-        SharedPlayerPtr copy = Player::copy.lock();
-        if( copy )
-            copy->collide_with( *this );
-    } else if( ! collider.isMovable ) {
-        vector_type r = unit( s - collider.s );
-        a -= 2 * ( a * r ) * r;
-        a *= 5;
-    }
-}
-
-Color Player::color()
-{
-    return Color(1,1,1,1);
-}
-
-Player2::Player2( const vector_type& pos )
-    : Player( pos )
-{
-}
-
-void Player2::move( float dt )
-{
-    Uint8* keyStates = SDL_GetKeyState( 0 );
-
-    const value_type SPEED = 0.25;
-
-    v = vector_type( 0, 0 );
-
-    if( keyStates[ SDLK_LEFT ] )
-        v.x( v.x() - SPEED );
-    if( keyStates[ SDLK_RIGHT ] )
-        v.x( v.x() + SPEED );
-    if( keyStates[ SDLK_UP ] )
-        v.y( v.y() - SPEED );
-    if( keyStates[ SDLK_DOWN ] )
-        v.y( v.y() + SPEED );
-
-    moreGravity = keyStates[ SDLK_SPACE ];
-
-    CircleActor::move( dt );
-}
-
-void Player2::collide_with( CircleActor& collider )
-{
-    if( collider.isMovable ) {
-        deleteMe = true;
-
-        // One can't survive without the other.
-        SharedPlayerPtr original = Player::original.lock();
-        if( !original->deleteMe )
-            original->collide_with( *this );
-    }
-}
-
-Color Player2::color()
-{
-    return Color( 1, .5, 1, 1 );
+    return (maxJumpCoolDown - jumpCoolDown) / maxJumpCoolDown;
 }

@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "Vector.h"
 #include "Collision.h"
 
