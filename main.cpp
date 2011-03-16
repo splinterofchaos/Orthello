@@ -49,7 +49,8 @@ int main( int, char** )
 
     if( SDL_Init( SDL_INIT_EVERYTHING ) < 0 )
         return 1;
-    make_sdl_gl_window( Screen::width, Screen::height );
+    if( make_sdl_gl_window( Screen::width, Screen::height ) != GL_NO_ERROR )
+        return 2;
 
     int w = 1000; // The width of one side of the area to spawn plats.
     for( int i=0; i < w/2; i++ )

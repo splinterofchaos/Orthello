@@ -38,11 +38,15 @@ void Platform::draw()
         Vec3( -scale, -scale,    z ),
         Vec3( -scale, -scale, -100 ),
         Vec3( -scale,  scale, -100 ),
-        Vec3( -scale,  scale,    z )
+        Vec3( -scale,  scale,    z ),
     };
 
     draw::Verts< Vec3 > verts( square, 4 );
     draw::Verts< Vec3 > side( wall, 4 );
+
+
+
+    Vec3 N( 1, 0, 0 );
 
     glColor3f( r, g, b );
     draw::draw( verts );
@@ -51,19 +55,19 @@ void Platform::draw()
     intensity *= intensity;
 
     glColor3f( 0.8*intensity, 0.4*intensity, 0.1*intensity );
+
     draw::draw( side );
 
     glRotatef( 90, 0, 0, 1 );
-    glColor3f( 0.85*intensity, 0.5*intensity, 0.15*intensity );
     draw::draw( side );
 
-    glColor3f( 0.9*intensity, 0.6*intensity, 0.15*intensity );
     glRotatef( 90, 0, 0, 1 );
     draw::draw( side );
 
-    glColor3f( 0.95*intensity, 0.7*intensity, 0.2*intensity );
     glRotatef( 90, 0, 0, 1 );
     draw::draw( side );
+
+    glDisableClientState( GL_NORMAL_ARRAY );
 
     glPopMatrix();
 }
