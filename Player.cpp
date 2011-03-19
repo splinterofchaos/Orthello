@@ -125,6 +125,8 @@ void Player::draw()
         vector( 1, 0 ),
         vector( 0, 0 ),
     };
+    
+    coords.texture = img.handle();
 
     glColor3f( 1, 1, 1 );
 

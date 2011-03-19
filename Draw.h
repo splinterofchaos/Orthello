@@ -81,10 +81,11 @@ template< typename V >
 class TexCoords
 {
     std::vector<V> coords;
-    int texture;
     
   public:
     typedef typename V::value_type type;
+
+    int texture;
 
     TexCoords( V* data, int texture=0, unsigned int n=4 )
         : texture( texture )
@@ -92,6 +93,13 @@ class TexCoords
         coords.resize( n );
         std::copy( data, data+n, coords.begin() );
     }
+
+#if defined( USE_INIT_LISTS )
+    TexCoords( std::initializer_list<V> l )
+        : coords( l ) 
+    {
+    }
+#endif
 
     void handle( int tex )
     {
