@@ -27,25 +27,22 @@ void Platform::draw()
 
     typedef Vector<float,3> Vec3;
 
-    Vec3 square[] = {
+    draw::Verts< Vec3 > top {
         Vec3( -scale, -scale, z ),
         Vec3(  scale, -scale, z ),
         Vec3(  scale,  scale, z ),
         Vec3( -scale,  scale, z )
     };
 
-    Vec3 wall[] = {
+    draw::Verts< Vec3 > side {
         Vec3( -scale, -scale,    z ),
         Vec3( -scale, -scale, -100 ),
         Vec3( -scale,  scale, -100 ),
         Vec3( -scale,  scale,    z )
     };
 
-    draw::Verts< Vec3 > verts( square, 4 );
-    draw::Verts< Vec3 > side( wall, 4 );
-
     glColor3f( r, g, b );
-    draw::draw( verts );
+    draw::draw( top );
 
     float intensity = ( r + g + b ) / 3;
     intensity *= intensity;

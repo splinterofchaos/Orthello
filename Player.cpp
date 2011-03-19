@@ -101,7 +101,8 @@ void Player::draw()
 
     // Since X and Y are verticle now, ignore Z.
     // Remember, this is only for the left side.
-    Vector<float,2> tmpVerts[] = {
+
+    draw::Verts<   Vector<float,2> > verts {
         vector( -10.f,  0.f ),
         vector(   0.f,  0.f ),
         vector(   0.f, 50.f ),
@@ -111,9 +112,9 @@ void Player::draw()
         vector(   0.f,  0.f ),
         vector(   0.f, 50.f ),
         vector(  10.f, 50.f ),
-    };
-
-    Vector<int,2> tmpCoord[] = {
+    };   
+    
+    draw::TexCoords< Vector<int,2> > coords {
         vector( 0, 1 ),
         vector( 1, 1 ),
         vector( 1, 0 ),
@@ -124,9 +125,6 @@ void Player::draw()
         vector( 1, 0 ),
         vector( 0, 0 ),
     };
-
-    draw::Verts<   Vector<float,2> > verts( tmpVerts, 8 );
-    draw::TexCoords< Vector<int,2> > coords( tmpCoord, img.handle(), 8 );
 
     glColor3f( 1, 1, 1 );
 

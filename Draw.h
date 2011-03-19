@@ -1,6 +1,21 @@
 
 #include "Vector.h"
 
+#if defined(__GNUC__) && __GXX_EXPERIMENTAL_CXX0X__
+    // If GXX_EXPERIMENT is true, GNUC is 4 or greater.
+    #if __GNUC__ > 4 || __GNUC_MINOR__ >= 3
+        #define USE_RVAL_REFS
+        #define USE_VARIADIC_TEMPLATES
+    #endif
+    #if __GNUC__ > 4 || __GNUC_MINOR__ >= 4
+        #define USE_INIT_LISTS
+    #endif
+#endif
+
+#if defined( USE_INIT_LISTS )
+    #include <initializer_list>
+#endif
+
 #include <iterator>
 #include <GL/gl.h>
 
@@ -40,13 +55,16 @@ class Verts
     };
 
     Verts( V* data, unsigned int n )
-        : n( n )
+        : verts( data, data + n )
     {
-        verts.resize( n );
-
-        while( n-- )
-            verts[ n ] = data[ n ];
     }
+
+#if defined( USE_INIT_LISTS )
+    Verts( std::initializer_list<V> l )
+        : verts( l ) 
+    {
+    }
+#endif
 
     const type* data() const
     {
@@ -55,7 +73,7 @@ class Verts
 
     unsigned int count() const
     {
-        return n;
+        return verts.size();
     }
 };
 
