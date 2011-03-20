@@ -20,7 +20,7 @@ void lighten_plat( Platform* plat, float brighten )
 {
     if( brighten > 0.01 && plat->lightAdd < brighten ) {
         plat->lightAdd = brighten;
-        brighten -= 0.15;
+        brighten -= 0.2;
 
         for( size_t i=0; i < plat->adjacents.size(); i++ )
             lighten_plat( plat->adjacents[i], brighten );
