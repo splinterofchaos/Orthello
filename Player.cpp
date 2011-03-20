@@ -16,6 +16,27 @@ Player::Player()
     jumpCoolDown = maxJumpCoolDown;
 }
 
+void lighten_plat( Platform* plat, float brighten )
+{
+    if( brighten > 0.01 && plat->lightAdd < brighten ) {
+        plat->lightAdd = brighten;
+        brighten -= 0.15;
+
+        for( size_t i=0; i < plat->adjacents.size(); i++ )
+            lighten_plat( plat->adjacents[i], brighten );
+    }
+}
+
+void darken_plat( Platform* plat )
+{
+    if( plat->lightAdd > 0.01 ) {
+        plat->lightAdd = 0;
+
+        for( size_t i=0; i < plat->adjacents.size(); i++ )
+            darken_plat( plat->adjacents[i] );
+    }
+}
+
 void Player::move( float dt )
 {
     if( ! plat ) {
@@ -64,9 +85,7 @@ void Player::move( float dt )
             }
 
             if( nextPlat && minAngle < 3.14 / 4 ) {
-                plat->lightAdd = 0;
-                for( size_t i=0; i < plat->adjacents.size(); i++ )
-                    plat->adjacents[i]->lightAdd = 0;
+                darken_plat( plat );
 
                 prevPlat = plat;
                 plat     = nextPlat;
@@ -89,9 +108,7 @@ void Player::move( float dt )
     float tmp = std::sin( 3.14 * jump_completion() );
     s.z() += 75 * dz * std::sqrt(tmp);
 
-    plat->lightAdd = 0.3;
-    for( size_t i=0; i < plat->adjacents.size(); i++ )
-        plat->adjacents[i]->lightAdd = 0.2;
+    lighten_plat( plat, 0.35 );
 }
 
 
