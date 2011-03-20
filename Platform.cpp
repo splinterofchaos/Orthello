@@ -11,6 +11,8 @@ Platform::Platform( const Vec& pos )
     s = pos;
     scale = 0;
 
+    lightAdd = 0;
+
     growthLeft = 50;
 
     r = random( 0.2f, 0.4f );
@@ -87,7 +89,7 @@ void Platform::draw()
 
     glEnableClientState( GL_NORMAL_ARRAY );
 
-    glColor3f( r, g, b );
+    glColor3f( r + lightAdd, g + lightAdd, b + lightAdd );
     glNormalPointer( GL_FLOAT, 0, topNorms );
     draw::draw( top );
 

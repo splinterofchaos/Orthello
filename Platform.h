@@ -15,6 +15,7 @@ class Platform : public Square
 
     int growthLeft;
     float r, g, b;
+    float lightAdd;
 
     Platform( const Vec& pos );
 

@@ -64,6 +64,10 @@ void Player::move( float dt )
             }
 
             if( nextPlat && minAngle < 3.14 / 4 ) {
+                plat->lightAdd = 0;
+                for( size_t i=0; i < plat->adjacents.size(); i++ )
+                    plat->adjacents[i]->lightAdd = 0;
+
                 prevPlat = plat;
                 plat     = nextPlat;
 
@@ -84,6 +88,10 @@ void Player::move( float dt )
 
     float tmp = std::sin( 3.14 * jump_completion() );
     s.z() += 75 * dz * std::sqrt(tmp);
+
+    plat->lightAdd = 0.3;
+    for( size_t i=0; i < plat->adjacents.size(); i++ )
+        plat->adjacents[i]->lightAdd = 0.2;
 }
 
 
