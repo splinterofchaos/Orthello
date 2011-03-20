@@ -15,7 +15,7 @@ Platform::Platform( const Vec& pos )
 
     r = random( 0.2f, 0.4f );
     g = random( 0.7f, 1.0f );
-    b = random( 0.4f, 0.5f );
+    b = random( 0.2f, 0.3f );
 }
 
 void Platform::draw()
@@ -49,10 +49,10 @@ void Platform::draw()
     };
 
     Vec3 wallNorms[] = {
-        Vec3( 0, 0,  1 ),
-        Vec3( 0, 0,  1 ),
-        Vec3( 0, 0, -1 ),
-        Vec3( 0, 0, -1 )
+        Vec3( 0, 1,  1 ),
+        Vec3( 0, 1,  1 ),
+        Vec3( 0, 1, -1 ),
+        Vec3( 0, 1, -1 )
     };
 
     glEnableClientState( GL_NORMAL_ARRAY );
