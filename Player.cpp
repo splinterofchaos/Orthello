@@ -90,7 +90,10 @@ void Player::move( float dt )
                 prevPlat = plat;
                 plat     = nextPlat;
 
-                maxJumpCoolDown = 500 * plat->height() / prevPlat->height();
+                maxJumpCoolDown = 600 * plat->height() / prevPlat->height();
+                if( maxJumpCoolDown < 100 )
+                    maxJumpCoolDown = 100;
+
                 jumpCoolDown = maxJumpCoolDown;
             }
         }
