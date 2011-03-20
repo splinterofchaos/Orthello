@@ -36,25 +36,31 @@ GLenum init_gl( int w, int h )
     glClearDepth(1000.0f);	
 
     // Lighting.
+    GLfloat specularMat = 0.2;
     glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
+    glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR, &specularMat );
+
     glEnable( GL_COLOR_MATERIAL ) ;
     
-    GLfloat ambiant[] = { 0.9, 0.9,  0.9, 0.5 };
-    GLfloat diffuse[] = { 0.3, 0.3,  0.3, 1 };
-    GLfloat pos[]     = { 0,     0, 1000, 1 };
-    GLfloat spot[]    = { 0, 1, -1, 1 };
+    GLfloat ambiant[]  = { 0.9, 0.9,  0.9, 0.5 };
+    GLfloat diffuse[]  = { 0.3, 0.3,  0.3,   1 };
+    GLfloat specular[] = {   1,   1,    1,   1 };
+    GLfloat pos[]      = {   0,   0,   10,   1 };
+    GLfloat spot[]     = {   0,   0,    1,   1 };
 
     glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuse );
 
-    glLightfv( GL_LIGHT1, GL_AMBIENT, ambiant );
-    glLightfv( GL_LIGHT1, GL_DIFFUSE, diffuse );
-    glLightfv( GL_LIGHT1, GL_POSITION, pos );
-    glLightfv( GL_LIGHT1, GL_SPOT_DIRECTION, spot );
+    glLightfv( GL_LIGHT1, GL_AMBIENT,  ambiant  );
+    glLightfv( GL_LIGHT1, GL_DIFFUSE,  diffuse  );
+    glLightfv( GL_LIGHT1, GL_SPECULAR, specular );
+    glLightfv( GL_LIGHT1, GL_POSITION, pos      );
 
-    glShadeModel( GL_SMOOTH );
+    glLightf( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.00001 );
 
     glEnable( GL_LIGHT1 );
     glEnable( GL_LIGHTING );
+
+    glShadeModel( GL_SMOOTH );
 
     glEnable( GL_NORMALIZE );
 
