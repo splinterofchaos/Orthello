@@ -39,7 +39,7 @@ GLenum init_gl( int w, int h )
     glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
     glEnable( GL_COLOR_MATERIAL ) ;
     
-    GLfloat ambiant[] = { 0.9, 0.9,  0.9, 1 };
+    GLfloat ambiant[] = { 0.9, 0.9,  0.9, 0.5 };
     GLfloat diffuse[] = { 0.3, 0.3,  0.3, 1 };
     GLfloat pos[]     = { 0,     0, 1000, 1 };
     GLfloat spot[]    = { 0, 1, -1, 1 };

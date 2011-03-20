@@ -49,10 +49,10 @@ void Platform::draw()
     Vec3 N( 1, 0, 0 );
 
     Vec3 topNorms[] = {
-        Vec3( -1, -1, 0.5 ),
-        Vec3(  1, -1, 0.5 ),
-        Vec3(  1,  1, 0.5 ),
-        Vec3( -1,  1, 0.5 )
+        Vec3( -1, -1, 0 ),
+        Vec3(  1, -1, 0 ),
+        Vec3(  1,  1, 0 ),
+        Vec3( -1,  1, 0 )
     };
 
     Vec3 wallNorms[] = {
