@@ -39,6 +39,21 @@ void Platform::draw()
         Vec3( -scale,  scale,    z ),
         Vec3( -scale,  scale, -100 ),
         Vec3( -scale, -scale, -100 ),
+
+        Vec3( -scale, -scale,    z ),
+        Vec3(  scale, -scale,    z ),
+        Vec3(  scale, -scale, -100 ),
+        Vec3( -scale, -scale, -100 ),
+
+        Vec3(  scale, -scale,    z ),
+        Vec3(  scale,  scale,    z ),
+        Vec3(  scale,  scale, -100 ),
+        Vec3(  scale, -scale, -100 ),
+
+        Vec3( -scale,  scale,    z ),
+        Vec3(  scale,  scale,    z ),
+        Vec3(  scale,  scale, -100 ),
+        Vec3( -scale,  scale, -100 ),
     };
 
     Vec3 topNorms[] = {
@@ -49,10 +64,25 @@ void Platform::draw()
     };
 
     Vec3 wallNorms[] = {
-        Vec3( 0, 1,  1 ),
-        Vec3( 0, 1,  1 ),
-        Vec3( 0, 1, -1 ),
-        Vec3( 0, 1, -1 )
+        Vec3( -1, -1,  2 ),
+        Vec3( -1,  1,  2 ),
+        Vec3( -1,  1, -2 ),
+        Vec3( -1, -1, -2 ),
+
+        Vec3( -1, -1,  2 ),
+        Vec3(  1, -1,  2 ),
+        Vec3(  1, -1, -2 ),
+        Vec3( -1, -1, -2 ),
+
+        Vec3(  1, -1,  2 ),
+        Vec3(  1,  1,  2 ),
+        Vec3(  1,  1, -2 ),
+        Vec3(  1, -1, -2 ),
+        
+        Vec3( -1,  1,  2 ),
+        Vec3(  1,  1,  2 ),
+        Vec3(  1,  1, -2 ),
+        Vec3( -1,  1, -2 ),
     };
 
     glEnableClientState( GL_NORMAL_ARRAY );
@@ -67,15 +97,6 @@ void Platform::draw()
     glColor3f( 0.8*intensity, 0.4*intensity, 0.1*intensity );
     glNormalPointer( GL_FLOAT, 0, wallNorms );
 
-    draw::draw( side );
-
-    glRotatef( 90, 0, 0, 1 );
-    draw::draw( side );
-
-    glRotatef( 90, 0, 0, 1 );
-    draw::draw( side );
-
-    glRotatef( 90, 0, 0, 1 );
     draw::draw( side );
 
     glDisableClientState( GL_NORMAL_ARRAY );
