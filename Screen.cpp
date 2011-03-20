@@ -31,8 +31,32 @@ GLenum init_gl( int w, int h )
     glEnable( GL_BLEND );
     glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
-    glDepthFunc( GL_LEQUAL );
     glEnable( GL_DEPTH_TEST );
+
+    glClearDepth(1000.0f);	
+
+    // Lighting.
+    glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
+    glEnable( GL_COLOR_MATERIAL ) ;
+    
+    GLfloat ambiant[] = { 0.9, 0.9,  0.9, 0.5 };
+    GLfloat diffuse[] = { 0.3, 0.3,  0.3, 1 };
+    GLfloat pos[]     = { 0,     0, 1000, 1 };
+    GLfloat spot[]    = { 0, 1, -1, 1 };
+
+    glMaterialfv( GL_FRONT, GL_DIFFUSE, diffuse );
+
+    glLightfv( GL_LIGHT1, GL_AMBIENT, ambiant );
+    glLightfv( GL_LIGHT1, GL_DIFFUSE, diffuse );
+    glLightfv( GL_LIGHT1, GL_POSITION, pos );
+    glLightfv( GL_LIGHT1, GL_SPOT_DIRECTION, spot );
+
+    glShadeModel( GL_SMOOTH );
+
+    glEnable( GL_LIGHT1 );
+    glEnable( GL_LIGHTING );
+
+    glEnable( GL_NORMALIZE );
 
     return glGetError();
 }
@@ -65,7 +89,8 @@ bool make_sdl_gl_window( int w, int h )
 
     if( ! resize_window(w,h) )
         return false;
-    init_gl( w, h );
+    if( ! init_gl( w, h ) )
+        return false;
 
 #ifdef __WIN32
     set_vsync( 0 );

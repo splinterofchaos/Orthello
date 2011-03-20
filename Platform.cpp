@@ -36,31 +36,49 @@ void Platform::draw()
 
     draw::Verts< Vec3 > side {
         Vec3( -scale, -scale,    z ),
-        Vec3( -scale, -scale, -100 ),
+        Vec3( -scale,  scale,    z ),
         Vec3( -scale,  scale, -100 ),
-        Vec3( -scale,  scale,    z )
+        Vec3( -scale, -scale, -100 ),
     };
 
+    Vec3 topNorms[] = {
+        Vec3( -1, -1, 0 ),
+        Vec3(  1, -1, 0 ),
+        Vec3(  1,  1, 0 ),
+        Vec3( -1,  1, 0 )
+    };
+
+    Vec3 wallNorms[] = {
+        Vec3( 0, 0,  1 ),
+        Vec3( 0, 0,  1 ),
+        Vec3( 0, 0, -1 ),
+        Vec3( 0, 0, -1 )
+    };
+
+    glEnableClientState( GL_NORMAL_ARRAY );
+
     glColor3f( r, g, b );
+    glNormalPointer( GL_FLOAT, 0, topNorms );
     draw::draw( top );
 
     float intensity = ( r + g + b ) / 3;
     intensity *= intensity;
 
     glColor3f( 0.8*intensity, 0.4*intensity, 0.1*intensity );
+    glNormalPointer( GL_FLOAT, 0, wallNorms );
+
     draw::draw( side );
 
     glRotatef( 90, 0, 0, 1 );
-    glColor3f( 0.85*intensity, 0.5*intensity, 0.15*intensity );
     draw::draw( side );
 
-    glColor3f( 0.9*intensity, 0.6*intensity, 0.15*intensity );
     glRotatef( 90, 0, 0, 1 );
     draw::draw( side );
 
-    glColor3f( 0.95*intensity, 0.7*intensity, 0.2*intensity );
     glRotatef( 90, 0, 0, 1 );
     draw::draw( side );
+
+    glDisableClientState( GL_NORMAL_ARRAY );
 
     glPopMatrix();
 }
