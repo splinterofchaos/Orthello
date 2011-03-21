@@ -9,6 +9,12 @@ float Screen::scale  = 1;
 
 bool resize_window( float w, float h, float scale )
 {
+#if defined( __linux__ )
+    // Seems to be necessary to do this on Linux, but bad on Windows.
+    if( !SDL_SetVideoMode(w, h, 32, SDL_OPENGL|SDL_RESIZABLE) )
+        return false;
+#endif
+
     glViewport( 0, 0, w, h );
     glMatrixMode( GL_PROJECTION );
     glLoadIdentity();

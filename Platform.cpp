@@ -37,25 +37,25 @@ void Platform::draw()
     // 6-7-8
 
     draw::Verts< Vec3 > top {
-        Vec3(      0,      0, z*1.3 ), // 4
-        Vec3( -scale,      0, z     ), // 3
-        Vec3( -scale, -scale, z     ), // 0
-        Vec3(      0, -scale, z     ), // 1
+        Vec3(      0,      0, z     ), // 4
+        Vec3( -scale,      0, z*0.7 ), // 3
+        Vec3( -scale, -scale, z*0.7 ), // 0
+        Vec3(      0, -scale, z*0.7 ), // 1
 
-        Vec3(      0,      0, z*1.3 ), // 4
-        Vec3(      0, -scale, z     ), // 1
-        Vec3(  scale, -scale, z     ), // 2
-        Vec3(  scale,      0, z     ), // 5
+        Vec3(      0,      0, z     ), // 4
+        Vec3(      0, -scale, z*0.7 ), // 1
+        Vec3(  scale, -scale, z*0.7 ), // 2
+        Vec3(  scale,      0, z*0.7 ), // 5
 
-        Vec3(      0,      0, z*1.3 ), // 4
-        Vec3(      0,  scale, z     ), // 7
-        Vec3( -scale,  scale, z     ), // 6
-        Vec3( -scale,      0, z     ), // 3
+        Vec3(      0,      0, z     ), // 4
+        Vec3(      0,  scale, z*0.7 ), // 7
+        Vec3( -scale,  scale, z*0.7 ), // 6
+        Vec3( -scale,      0, z*0.7 ), // 3
 
-        Vec3(      0,      0, z*1.3 ), // 4
-        Vec3(  scale,      0, z     ), // 5
-        Vec3(  scale,  scale, z     ), // 8
-        Vec3(      0,  scale, z     ), // 7
+        Vec3(      0,      0, z     ), // 4
+        Vec3(  scale,      0, z*0.7 ), // 5
+        Vec3(  scale,  scale, z*0.7 ), // 8
+        Vec3(      0,  scale, z*0.7 ), // 7
     };
 
     Vec3 topNorms[] = {
@@ -81,25 +81,25 @@ void Platform::draw()
     };
 
     draw::Verts< Vec3 > side {
-        Vec3( -scale, -scale,    z ),
-        Vec3( -scale,  scale,    z ),
-        Vec3( -scale,  scale, -100 ),
-        Vec3( -scale, -scale, -100 ),
+        Vec3( -scale, -scale, z*0.7 ),
+        Vec3( -scale,  scale, z*0.7 ),
+        Vec3( -scale,  scale,  -100 ),
+        Vec3( -scale, -scale,  -100 ),
 
-        Vec3( -scale, -scale,    z ),
-        Vec3(  scale, -scale,    z ),
-        Vec3(  scale, -scale, -100 ),
-        Vec3( -scale, -scale, -100 ),
+        Vec3( -scale, -scale, z*0.7 ),
+        Vec3(  scale, -scale, z*0.7 ),
+        Vec3(  scale, -scale,  -100 ),
+        Vec3( -scale, -scale,  -100 ),
 
-        Vec3(  scale, -scale,    z ),
-        Vec3(  scale,  scale,    z ),
-        Vec3(  scale,  scale, -100 ),
-        Vec3(  scale, -scale, -100 ),
+        Vec3(  scale, -scale, z*0.7 ),
+        Vec3(  scale,  scale, z*0.7 ),
+        Vec3(  scale,  scale,  -100 ),
+        Vec3(  scale, -scale,  -100 ),
 
-        Vec3( -scale,  scale,    z ),
-        Vec3(  scale,  scale,    z ),
-        Vec3(  scale,  scale, -100 ),
-        Vec3( -scale,  scale, -100 ),
+        Vec3( -scale,  scale, z*0.7 ),
+        Vec3(  scale,  scale, z*0.7 ),
+        Vec3(  scale,  scale,  -100 ),
+        Vec3( -scale,  scale,  -100 ),
     };
 
     Vec3 wallNorms[] = {
