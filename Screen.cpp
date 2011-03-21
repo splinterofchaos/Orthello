@@ -36,7 +36,7 @@ GLenum init_gl( int w, int h )
     glClearDepth(1000.0f);	
 
     // Lighting.
-    GLfloat specularMat[] = { 0.2, 0.2, 0.2, 1 };
+    GLfloat specularMat[] = { 0.1, 0.1, 0.1, 1 };
     glColorMaterial( GL_FRONT_AND_BACK, GL_EMISSION ) ;
     glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR,  specularMat );
 
