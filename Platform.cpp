@@ -30,50 +30,54 @@ void Platform::draw()
     typedef Vector<float,3> Vec3;
 
     // TOP MAP
-    // 0---14--5
-    // |   |   |
-    // |   |   |
-    // 38-279C-6D
-    // |   |   |
-    // |   |   |
-    // B--7AF--E
+    // 0-1-2
+    // | | |
+    // 3-4-5
+    // | | |
+    // 6-7-8
 
     draw::Verts< Vec3 > top {
-        Vec3( -scale, -scale, z ), // 0
-        Vec3(      0, -scale, z ), // 1
-        Vec3(      0,      0, z ), // 2
-        Vec3( -scale,      0, z ), // 3
-        Vec3(      0, -scale, z ), // 4
-        Vec3(  scale, -scale, z ), // 5
-        Vec3(  scale,      0, z ), // 6
-        Vec3(      0,      0, z ), // 7
-        Vec3( -scale,      0, z ), // 8
-        Vec3(      0,      0, z ), // 9
-        Vec3(      0,  scale, z ), // A
-        Vec3( -scale,  scale, z ), // B
-        Vec3(      0,      0, z ), // C
-        Vec3(  scale,      0, z ), // D
-        Vec3(  scale,  scale, z ), // E
-        Vec3(      0,  scale, z ), // F
+        Vec3(      0,      0, z*1.3 ), // 4
+        Vec3( -scale,      0, z     ), // 3
+        Vec3( -scale, -scale, z     ), // 0
+        Vec3(      0, -scale, z     ), // 1
+
+        Vec3(      0,      0, z*1.3 ), // 4
+        Vec3(      0, -scale, z     ), // 1
+        Vec3(  scale, -scale, z     ), // 2
+        Vec3(  scale,      0, z     ), // 5
+
+        Vec3(      0,      0, z*1.3 ), // 4
+        Vec3(      0,  scale, z     ), // 7
+        Vec3( -scale,  scale, z     ), // 6
+        Vec3( -scale,      0, z     ), // 3
+
+        Vec3(      0,      0, z*1.3 ), // 4
+        Vec3(  scale,      0, z     ), // 5
+        Vec3(  scale,  scale, z     ), // 8
+        Vec3(      0,  scale, z     ), // 7
     };
 
     Vec3 topNorms[] = {
-        Vec3( -1, -1, 0 ), // 0
+        Vec3(  0,  0,   1 ), // 4
+        Vec3( -1,  0, 0.5 ), // 3
+        Vec3( -1, -1,   0 ), // 0
         Vec3(  0, -1, 0.5 ), // 1
-        Vec3(  0,  0, 1 ), // 2
-        Vec3( -1,  0, 0 ), // 3
-        Vec3(  0, -1, 0.5 ), // 4
-        Vec3(  1, -1, 0 ), // 5
-        Vec3(  1,  0, 0.5 ), // 6
-        Vec3(  0,  0, 1 ), // 7
-        Vec3( -1,  1, 0 ), // 8
-        Vec3(  0,  0, 1 ), // 9
-        Vec3(  0,  1, 0.5 ), // A
-        Vec3( -1,  1, 0 ), // B
-        Vec3(  0,  0, 1 ), // C
-        Vec3(  1,  0, 0.5 ), // D
-        Vec3(  1,  1, 0 ), // E
-        Vec3(  0,  1, 0.5 ), // F
+                                 
+        Vec3(  0,  0,   1 ), // 4
+        Vec3(  0, -1, 0.5 ), // 1
+        Vec3(  1, -1,   0 ), // 2
+        Vec3(  1,  0, 0.5 ), // 5
+                                 
+        Vec3(  0,  0,   1 ), // 4
+        Vec3(  0,  1, 0.5 ), // 7
+        Vec3( -1,  1,   0 ), // 6
+        Vec3( -1,  0, 0.5 ), // 3
+                                 
+        Vec3(  0,  0,   1 ), // 4
+        Vec3(  1,  0, 0.5 ), // 5
+        Vec3(  1,  1,   0 ), // 8
+        Vec3(  0,  1, 0.5 ), // 7
     };
 
     draw::Verts< Vec3 > side {
@@ -99,31 +103,32 @@ void Platform::draw()
     };
 
     Vec3 wallNorms[] = {
-        Vec3( -1, -1,  2 ),
-        Vec3( -1,  1,  2 ),
-        Vec3( -1,  1, -2 ),
-        Vec3( -1, -1, -2 ),
+        Vec3( -1, -0.5,  0.25 ),
+        Vec3( -1,  0.5,  0.25 ),
+        Vec3( -1,  0.5, -0.25 ),
+        Vec3( -1, -0.5, -0.25 ),
 
-        Vec3( -1, -1,  2 ),
-        Vec3(  1, -1,  2 ),
-        Vec3(  1, -1, -2 ),
-        Vec3( -1, -1, -2 ),
+        Vec3( -0.5, -1,  0.25 ),
+        Vec3(  0.5, -1,  0.25 ),
+        Vec3(  0.5, -1, -0.25 ),
+        Vec3( -0.5, -1, -0.25 ),
 
-        Vec3(  1, -1,  2 ),
-        Vec3(  1,  1,  2 ),
-        Vec3(  1,  1, -2 ),
-        Vec3(  1, -1, -2 ),
+        Vec3(  1, -0.5,  0.25 ),
+        Vec3(  1,  0.5,  0.25 ),
+        Vec3(  1,  0.5, -0.25 ),
+        Vec3(  1, -0.5, -0.25 ),
         
-        Vec3( -1,  1,  2 ),
-        Vec3(  1,  1,  2 ),
-        Vec3(  1,  1, -2 ),
-        Vec3( -1,  1, -2 ),
+        Vec3( -0.5,  1,  0.25 ),
+        Vec3(  0.5,  1,  0.25 ),
+        Vec3(  0.5,  1, -0.25 ),
+        Vec3( -0.5,  1, -0.25 ),
     };
 
     glEnableClientState( GL_NORMAL_ARRAY );
 
     glColor3f( r + lightAdd, g + lightAdd, b + lightAdd );
     glNormalPointer( GL_FLOAT, 0, topNorms );
+
     draw::draw( top );
 
     float intensity = ( r + g + b ) / 3;
