@@ -61,22 +61,22 @@ void Platform::draw()
     Vec3 topNorms[] = {
         Vec3(  0,  0,   1 ), // 4
         Vec3( -1,  0, 0.5 ), // 3
-        Vec3( -1, -1,   0 ), // 0
+        Vec3( -1, -1, 0.5 ), // 0
         Vec3(  0, -1, 0.5 ), // 1
                                  
         Vec3(  0,  0,   1 ), // 4
         Vec3(  0, -1, 0.5 ), // 1
-        Vec3(  1, -1,   0 ), // 2
+        Vec3(  1, -1, 0.5 ), // 2
         Vec3(  1,  0, 0.5 ), // 5
                                  
         Vec3(  0,  0,   1 ), // 4
         Vec3(  0,  1, 0.5 ), // 7
-        Vec3( -1,  1,   0 ), // 6
+        Vec3( -1,  1, 0.5 ), // 6
         Vec3( -1,  0, 0.5 ), // 3
                                  
         Vec3(  0,  0,   1 ), // 4
         Vec3(  1,  0, 0.5 ), // 5
-        Vec3(  1,  1,   0 ), // 8
+        Vec3(  1,  1, 0.5 ), // 8
         Vec3(  0,  1, 0.5 ), // 7
     };
 
@@ -105,23 +105,23 @@ void Platform::draw()
     Vec3 wallNorms[] = {
         Vec3( -1, -0.5,  0.25 ),
         Vec3( -1,  0.5,  0.25 ),
-        Vec3( -1,  0.5, -0.25 ),
-        Vec3( -1, -0.5, -0.25 ),
+        Vec3( -1,  0.5, -0.00 ),
+        Vec3( -1, -0.5, -0.00 ),
 
         Vec3( -0.5, -1,  0.25 ),
         Vec3(  0.5, -1,  0.25 ),
-        Vec3(  0.5, -1, -0.25 ),
-        Vec3( -0.5, -1, -0.25 ),
+        Vec3(  0.5, -1, -0.00 ),
+        Vec3( -0.5, -1, -0.00 ),
 
         Vec3(  1, -0.5,  0.25 ),
         Vec3(  1,  0.5,  0.25 ),
-        Vec3(  1,  0.5, -0.25 ),
-        Vec3(  1, -0.5, -0.25 ),
+        Vec3(  1,  0.5, -0.00 ),
+        Vec3(  1, -0.5, -0.00 ),
         
         Vec3( -0.5,  1,  0.25 ),
         Vec3(  0.5,  1,  0.25 ),
-        Vec3(  0.5,  1, -0.25 ),
-        Vec3( -0.5,  1, -0.25 ),
+        Vec3(  0.5,  1, -0.00 ),
+        Vec3( -0.5,  1, -0.00 ),
     };
 
     glEnableClientState( GL_NORMAL_ARRAY );
@@ -132,7 +132,7 @@ void Platform::draw()
     draw::draw( top );
 
     float intensity = ( r + g + b ) / 3;
-    intensity *= intensity;
+    intensity *= 2 * intensity;
 
     glColor3f( 0.8*intensity, 0.4*intensity, 0.1*intensity );
     glNormalPointer( GL_FLOAT, 0, wallNorms );

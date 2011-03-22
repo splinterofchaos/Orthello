@@ -190,6 +190,9 @@ int main( int, char** )
 
             glLoadIdentity();
 
+            GLfloat camPos[] = { 0, 0, -player.s[2]-10, 1 };
+            glLightfv( GL_LIGHT1, GL_POSITION, camPos );
+
             // Rotate the scene for the next run.
             glRotatef(             45, 1, 0, 0 );
             glRotatef( World::zRotDeg, 0, 0, 1 );

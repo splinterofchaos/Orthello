@@ -42,23 +42,28 @@ GLenum init_gl( int w, int h )
     glClearDepth(1000.0f);	
 
     // Lighting.
-    GLfloat specularMat[] = { 0.1, 0.1, 0.1, 1 };
-    glColorMaterial( GL_FRONT_AND_BACK, GL_EMISSION ) ;
+    GLfloat specularMat[] = { 0.05, 0.05, 0.05, 1 };
+    GLfloat emissionMat[] = { -0.3, -0.3, -0.3, 1 };
+    GLfloat one[] = { 1, 1, 1, 1 };
+    glColorMaterial( GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE ) ;
     glMaterialfv( GL_FRONT_AND_BACK, GL_SPECULAR,  specularMat );
+    glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION,  emissionMat );
+    glMaterialfv( GL_FRONT_AND_BACK, GL_DIFFUSE,  one );
 
     glEnable( GL_COLOR_MATERIAL ) ;
     
-    GLfloat diffuse[]  = { 0.3, 0.3,  0.3,   1 };
-    GLfloat specular[] = {   1,   1,    1,   1 };
-    GLfloat pos[]      = {   0,   0,   10,   1 };
+    GLfloat diffuse[]  = { 0.7, 0.7,  0.7,   1 };
+    GLfloat ambient[]  = {   1,   1,    1,   1 };
+    GLfloat pos[]      = {   0,   0,  100,   1 };
     GLfloat spot[]     = {   1,   1,   -1,   1 };
 
+    glLightfv( GL_LIGHT1, GL_AMBIENT,  ambient  );
     glLightfv( GL_LIGHT1, GL_DIFFUSE,  diffuse  );
-    glLightfv( GL_LIGHT1, GL_SPECULAR, specular );
     glLightfv( GL_LIGHT1, GL_POSITION, pos      );
     glLightfv( GL_LIGHT1, GL_SPOT_DIRECTION, spot );
 
     glLightf( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.00001 );
+    glLightf( GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.0001 );
 
     glEnable( GL_LIGHT1 );
     glEnable( GL_LIGHTING );
