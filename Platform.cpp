@@ -38,24 +38,24 @@ void Platform::draw()
 
     draw::Verts< Vec3 > top {
         Vec3(      0,      0, z     ), // 4
-        Vec3( -scale,      0, z*0.7 ), // 3
-        Vec3( -scale, -scale, z*0.7 ), // 0
-        Vec3(      0, -scale, z*0.7 ), // 1
+        Vec3( -scale,      0, z*0.8 ), // 3
+        Vec3( -scale, -scale, z*0.8 ), // 0
+        Vec3(      0, -scale, z*0.8 ), // 1
 
         Vec3(      0,      0, z     ), // 4
-        Vec3(      0, -scale, z*0.7 ), // 1
-        Vec3(  scale, -scale, z*0.7 ), // 2
-        Vec3(  scale,      0, z*0.7 ), // 5
+        Vec3(      0, -scale, z*0.8 ), // 1
+        Vec3(  scale, -scale, z*0.8 ), // 2
+        Vec3(  scale,      0, z*0.8 ), // 5
 
         Vec3(      0,      0, z     ), // 4
-        Vec3(      0,  scale, z*0.7 ), // 7
-        Vec3( -scale,  scale, z*0.7 ), // 6
-        Vec3( -scale,      0, z*0.7 ), // 3
+        Vec3(      0,  scale, z*0.8 ), // 7
+        Vec3( -scale,  scale, z*0.8 ), // 6
+        Vec3( -scale,      0, z*0.8 ), // 3
 
         Vec3(      0,      0, z     ), // 4
-        Vec3(  scale,      0, z*0.7 ), // 5
-        Vec3(  scale,  scale, z*0.7 ), // 8
-        Vec3(      0,  scale, z*0.7 ), // 7
+        Vec3(  scale,      0, z*0.8 ), // 5
+        Vec3(  scale,  scale, z*0.8 ), // 8
+        Vec3(      0,  scale, z*0.8 ), // 7
     };
 
     Vec3 topNorms[] = {
@@ -81,47 +81,47 @@ void Platform::draw()
     };
 
     draw::Verts< Vec3 > side {
-        Vec3( -scale, -scale, z*0.7 ),
-        Vec3( -scale,  scale, z*0.7 ),
+        Vec3( -scale, -scale, z*0.8 ),
+        Vec3( -scale,  scale, z*0.8 ),
         Vec3( -scale,  scale,  -100 ),
         Vec3( -scale, -scale,  -100 ),
 
-        Vec3( -scale, -scale, z*0.7 ),
-        Vec3(  scale, -scale, z*0.7 ),
+        Vec3( -scale, -scale, z*0.8 ),
+        Vec3(  scale, -scale, z*0.8 ),
         Vec3(  scale, -scale,  -100 ),
         Vec3( -scale, -scale,  -100 ),
 
-        Vec3(  scale, -scale, z*0.7 ),
-        Vec3(  scale,  scale, z*0.7 ),
+        Vec3(  scale, -scale, z*0.8 ),
+        Vec3(  scale,  scale, z*0.8 ),
         Vec3(  scale,  scale,  -100 ),
         Vec3(  scale, -scale,  -100 ),
 
-        Vec3( -scale,  scale, z*0.7 ),
-        Vec3(  scale,  scale, z*0.7 ),
+        Vec3( -scale,  scale, z*0.8 ),
+        Vec3(  scale,  scale, z*0.8 ),
         Vec3(  scale,  scale,  -100 ),
         Vec3( -scale,  scale,  -100 ),
     };
 
     Vec3 wallNorms[] = {
-        Vec3( -1, -0.5,  0.25 ),
-        Vec3( -1,  0.5,  0.25 ),
-        Vec3( -1,  0.5, -0.00 ),
-        Vec3( -1, -0.5, -0.00 ),
+        Vec3( -1, 0, 0 ),
+        Vec3( -1, 0, 0 ),
+        Vec3( -1, 0, 0 ),
+        Vec3( -1, 0, 0 ),
 
-        Vec3( -0.5, -1,  0.25 ),
-        Vec3(  0.5, -1,  0.25 ),
-        Vec3(  0.5, -1, -0.00 ),
-        Vec3( -0.5, -1, -0.00 ),
+        Vec3( 0, -1, 0 ),
+        Vec3( 0, -1, 0 ),
+        Vec3( 0, -1, 0 ),
+        Vec3( 0, -1, 0 ),
 
-        Vec3(  1, -0.5,  0.25 ),
-        Vec3(  1,  0.5,  0.25 ),
-        Vec3(  1,  0.5, -0.00 ),
-        Vec3(  1, -0.5, -0.00 ),
+        Vec3(  1, 0, 0 ),
+        Vec3(  1, 0, 0 ),
+        Vec3(  1, 0, 0 ),
+        Vec3(  1, 0, 0 ),
         
-        Vec3( -0.5,  1,  0.25 ),
-        Vec3(  0.5,  1,  0.25 ),
-        Vec3(  0.5,  1, -0.00 ),
-        Vec3( -0.5,  1, -0.00 ),
+        Vec3( 0,  1, 0 ),
+        Vec3( 0,  1, 0 ),
+        Vec3( 0,  1, 0 ),
+        Vec3( 0,  1, 0 ),
     };
 
     glEnableClientState( GL_NORMAL_ARRAY );
@@ -134,7 +134,7 @@ void Platform::draw()
     float intensity = ( r + g + b ) / 3;
     intensity *= 2 * intensity;
 
-    glColor3f( 0.8*intensity, 0.4*intensity, 0.1*intensity );
+    glColor3f( 0.6, 0.5, 0 );
     glNormalPointer( GL_FLOAT, 0, wallNorms );
 
     draw::draw( side );
@@ -153,5 +153,5 @@ void Platform::add_adjacent( Platform* p )
 
 float Platform::height()
 {
-    return scale * scale / 30;
+    return scale * scale / 20;
 }

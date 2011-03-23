@@ -20,7 +20,7 @@ void lighten_plat( Platform* plat, float brighten )
 {
     if( brighten > 0.01 && plat->lightAdd < brighten ) {
         plat->lightAdd = brighten;
-        brighten -= 0.2;
+        brighten -= 0.5;
 
         for( size_t i=0; i < plat->adjacents.size(); i++ )
             lighten_plat( plat->adjacents[i], brighten );
@@ -111,7 +111,7 @@ void Player::move( float dt )
     float tmp = std::sin( 3.14 * jump_completion() );
     s.z() += 75 * dz * std::sqrt(tmp);
 
-    lighten_plat( plat, 0.35 );
+    lighten_plat( plat, 0.9 );
 }
 
 

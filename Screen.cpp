@@ -25,6 +25,10 @@ bool resize_window( float w, float h, float scale )
     glOrtho( -w/2, w/2, h/2, -h/2, -10000, 10000 );
     glMatrixMode( GL_MODELVIEW );
 
+    glLightf( GL_LIGHT1, GL_CONSTANT_ATTENUATION, 0.1 / (scale * scale) );
+    glLightf( GL_LIGHT1, GL_LINEAR_ATTENUATION, 0.01 / (scale * scale) );
+    glLightf( GL_LIGHT1, GL_QUADRATIC_ATTENUATION, 0.00001 / (scale * scale) );
+
     return true;
 }
 
