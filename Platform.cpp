@@ -15,9 +15,9 @@ Platform::Platform( const Vec& pos )
 
     growthLeft = 50;
 
-    r = random( 0.2f, 0.4f );
-    g = random( 0.7f, 1.0f );
-    b = random( 0.2f, 0.3f );
+    r = random( 0.0f, 0.4f );
+    g = random( 0.4f, 1.0f );
+    b = random( 0.0f, 0.2f );
 }
 
 void Platform::draw()
