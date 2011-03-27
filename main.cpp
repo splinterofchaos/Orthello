@@ -61,7 +61,8 @@ int main( int, char** )
         platforms.push_back( Platform( pos ) );
     }
 
-    Player player;
+    std::shared_ptr<Player> player( new Player );
+    Player::weakPlayer = player;
 
     Player::img.load( "art/Wizzard.bmp" );
 
@@ -162,15 +163,15 @@ int main( int, char** )
                 } // For platforms[i].
 
                 if( ! growing )
-                    player.plat = &platforms[ random(0, platforms.size()) ];
+                    player->plat = &platforms[ random(0, platforms.size()) ];
             } // If growing.
             else
             {
-                player.move( DT );
+                player->move( DT );
 
-                if( player.plat ) {
+                if( player->plat ) {
                     const float SCALE_FACTOR = 0.02;
-                    Screen::scale = player.prevPlat->scale + (player.plat->scale-player.prevPlat->scale)*player.jump_completion();
+                    Screen::scale = player->prevPlat->scale + (player->plat->scale-player->prevPlat->scale)*player->jump_completion();
                     Screen::scale *= SCALE_FACTOR;
                     resize_window( Screen::width, Screen::height, Screen::scale );
                 }
@@ -180,7 +181,7 @@ int main( int, char** )
         for( size_t i=0; i < platforms.size(); i++ )
             platforms[i].draw();
 
-        player.draw();
+        player->draw();
 
         static Timer realTimer;
         realTimer.update();
@@ -190,7 +191,7 @@ int main( int, char** )
 
             glLoadIdentity();
 
-            GLfloat camPos[] = { 0, -player.s[2]+10, 0, 1 };
+            GLfloat camPos[] = { 0, -player->s[2]+10, 0, 1 };
             glLightfv( GL_LIGHT1, GL_POSITION, camPos );
 
             // Rotate the scene for the next run.
@@ -198,13 +199,13 @@ int main( int, char** )
             glRotatef( World::zRotDeg, 0, 0, 1 );
 
             float z;
-            if( player.plat && player.prevPlat  )
-                z = player.prevPlat->s.z() + (player.plat->s.z()-player.prevPlat->s.z())*player.jump_completion();
+            if( player->plat && player->prevPlat  )
+                z = player->prevPlat->s.z() + (player->plat->s.z()-player->prevPlat->s.z())*player->jump_completion();
             else
-                z = player.s.z();
+                z = player->s.z();
 
             // Center the camera on the player.
-            glTranslatef( -player.s.x(), -player.s.y(), -z );
+            glTranslatef( -player->s.x(), -player->s.y(), -z );
         }
         
         if( paused )

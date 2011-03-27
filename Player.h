@@ -5,8 +5,11 @@
 #include "Texture.h"
 #include "Platform.h"
 
+#include <memory> // For weak_ptr.
+
 struct Player
 {
+    static std::weak_ptr< Player > weakPlayer;
     static Texture img;
 
     Vector<float,3> s;
@@ -23,4 +26,3 @@ struct Player
 
     float jump_completion() const;
 };
-

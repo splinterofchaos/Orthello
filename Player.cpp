@@ -7,6 +7,7 @@
 #include "World.h"
 
 Texture Player::img;
+std::weak_ptr< Player > Player::weakPlayer;
 
 Player::Player()
 {
