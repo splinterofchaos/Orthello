@@ -39,6 +39,10 @@ void keyboard_events()
 typedef std::vector< Platform > Platforms;
 Platforms platforms;
 
+typedef std::shared_ptr<Player> ActorPtr;
+typedef std::vector< ActorPtr > Actors;
+Actors actors;
+
 int main( int, char** )
 {
     const int IDEAL_FRAME_TIME = Timer::SECOND / 60;
@@ -61,7 +65,6 @@ int main( int, char** )
         platforms.push_back( Platform( pos ) );
     }
 
-    std::shared_ptr<Player> player;
     //Player::weakPlayer = player;
 
     Player::img.load( "art/Wizzard.bmp" );
@@ -69,6 +72,8 @@ int main( int, char** )
     Timer frameTimer;
     while( quit == false )
     {
+        std::shared_ptr<Player> player = Player::weakPlayer.lock();
+        
         Keyboard::update();
 
         static SDL_Event event;
@@ -164,14 +169,16 @@ int main( int, char** )
 
                 if( ! growing ) {
                     Platform* randPlat = &platforms[ random(0, platforms.size() ) ];
-                    player.reset( new Player(randPlat) );
+                    actors.push_back( ActorPtr(new Player(randPlat)) );
+                    Player::weakPlayer = actors.back();
                 }
             } // If growing.
             else
             {
-                player->move( DT );
+                for( size_t i=0; i < actors.size(); i++ )
+                    actors[i]->move( DT );
 
-                if( player->plat ) {
+                if( player && player->plat ) {
                     const float SCALE_FACTOR = 0.02;
                     Screen::scale = player->prevPlat->scale + (player->plat->scale-player->prevPlat->scale)*player->jump_completion();
                     Screen::scale *= SCALE_FACTOR;
@@ -183,8 +190,8 @@ int main( int, char** )
         for( size_t i=0; i < platforms.size(); i++ )
             platforms[i].draw();
 
-        if( player )
-            player->draw();
+        for( size_t i=0; i < actors.size(); i++ )
+            actors[i]->draw();
 
         static Timer realTimer;
         realTimer.update();
