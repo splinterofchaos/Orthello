@@ -37,6 +37,53 @@ void darken_plat( Platform* plat )
     }
 }
 
+Platform* Player::choose_next_plat()
+{
+    Vector<float,2> input( 0, 0 );
+
+    if( Keyboard::key_down('w') )
+        input.y() += -1;
+    if( Keyboard::key_down('s') )
+        input.y() +=  1;
+    if( Keyboard::key_down('a') )
+        input.x() += -1;
+    if( Keyboard::key_down('d') )
+        input.x() +=  1;
+
+    if( magnitude(input) > 0.01f ) 
+    {
+        // Input is rotated to match perspective.
+        Vector<float,2> direction;
+
+        float rotate = -World::zRotDeg * 3.14f/180.f;
+        direction.x( std::cos(rotate)*input.x() - std::sin(rotate)*input.y() );
+        direction.y( std::sin(rotate)*input.x() + std::cos(rotate)*input.y() );
+
+        // Find platform most in the direction the player is facing.
+        Platform* nextPlat = 0;
+        float minAngle = 366;
+        for( size_t i=0; i < plat->adjacents.size(); i++ ) 
+        {
+            Vector<float,2> d = plat->adjacents[i]->s - plat->s;
+
+            float angle = angle_between( direction, d );
+            if( angle < minAngle ) {
+                minAngle = angle;
+                nextPlat = plat->adjacents[i];
+            }
+        }
+
+        Platform* next;
+
+        if( nextPlat && minAngle < 3.14 / 4 )
+            next = nextPlat;
+        else
+            next = 0;
+
+        return next;
+    }
+}
+
 void Player::move( float dt )
 {
     if( ! plat ) {
@@ -50,52 +97,19 @@ void Player::move( float dt )
     jumpCoolDown = std::max( jumpCoolDown-dt, 0.f );
 
     if( jumpCoolDown <= 0 ) {
-        Vector<float,2> input( 0, 0 );
+        auto next = choose_next_plat();
 
-        if( Keyboard::key_down('w') )
-            input.y() += -1;
-        if( Keyboard::key_down('s') )
-            input.y() +=  1;
-        if( Keyboard::key_down('a') )
-            input.x() += -1;
-        if( Keyboard::key_down('d') )
-            input.x() +=  1;
+        if( next ) {
+            darken_plat( plat );
 
-        if( magnitude(input) > 0.01f ) 
-        {
-            // Input is rotated to match perspective.
-            Vector<float,2> direction;
+            prevPlat = plat;
+            plat     = next;
 
-            float rotate = -World::zRotDeg * 3.14f/180.f;
-            direction.x( std::cos(rotate)*input.x() - std::sin(rotate)*input.y() );
-            direction.y( std::sin(rotate)*input.x() + std::cos(rotate)*input.y() );
+            maxJumpCoolDown = 600 * plat->height() / prevPlat->height();
+            if( maxJumpCoolDown < 100 )
+                maxJumpCoolDown = 100;
 
-            // Find platform most in the direction the player is facing.
-            Platform* nextPlat = 0;
-            float minAngle = 366;
-            for( size_t i=0; i < plat->adjacents.size(); i++ ) 
-            {
-                Vector<float,2> d = plat->adjacents[i]->s - plat->s;
-
-                float angle = angle_between( direction, d );
-                if( angle < minAngle ) {
-                    minAngle = angle;
-                    nextPlat = plat->adjacents[i];
-                }
-            }
-
-            if( nextPlat && minAngle < 3.14 / 4 ) {
-                darken_plat( plat );
-
-                prevPlat = plat;
-                plat     = nextPlat;
-
-                maxJumpCoolDown = 600 * plat->height() / prevPlat->height();
-                if( maxJumpCoolDown < 100 )
-                    maxJumpCoolDown = 100;
-
-                jumpCoolDown = maxJumpCoolDown;
-            }
+            jumpCoolDown = maxJumpCoolDown;
         }
     }
 

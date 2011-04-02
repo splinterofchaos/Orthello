@@ -20,6 +20,8 @@ struct Player
 
     Player( Platform* p );
 
+    Platform* choose_next_plat();
+    
     void move( float dt );
 
     void draw();
