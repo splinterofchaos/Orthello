@@ -9,10 +9,9 @@
 Texture Player::img;
 std::weak_ptr< Player > Player::weakPlayer;
 
-Player::Player()
+Player::Player( Platform* p )
 {
-    plat = 0;
-    prevPlat = 0;
+    prevPlat = plat = p;
     maxJumpCoolDown = 800;
     jumpCoolDown = maxJumpCoolDown;
 }

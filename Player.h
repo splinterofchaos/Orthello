@@ -18,7 +18,7 @@ struct Player
     float jumpCoolDown;
     float maxJumpCoolDown;
 
-    Player();
+    Player( Platform* p );
 
     void move( float dt );
 

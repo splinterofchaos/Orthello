@@ -61,8 +61,8 @@ int main( int, char** )
         platforms.push_back( Platform( pos ) );
     }
 
-    std::shared_ptr<Player> player( new Player );
-    Player::weakPlayer = player;
+    std::shared_ptr<Player> player;
+    //Player::weakPlayer = player;
 
     Player::img.load( "art/Wizzard.bmp" );
 
@@ -162,8 +162,10 @@ int main( int, char** )
                     } // For platforms[j].
                 } // For platforms[i].
 
-                if( ! growing )
-                    player->plat = &platforms[ random(0, platforms.size()) ];
+                if( ! growing ) {
+                    Platform* randPlat = &platforms[ random(0, platforms.size() ) ];
+                    player.reset( new Player(randPlat) );
+                }
             } // If growing.
             else
             {
@@ -181,7 +183,8 @@ int main( int, char** )
         for( size_t i=0; i < platforms.size(); i++ )
             platforms[i].draw();
 
-        player->draw();
+        if( player )
+            player->draw();
 
         static Timer realTimer;
         realTimer.update();
@@ -191,21 +194,30 @@ int main( int, char** )
 
             glLoadIdentity();
 
-            GLfloat camPos[] = { 0, -player->s[2]+10, 0, 1 };
+            float y = player? -player->s.z() + 10 : 0;
+
+            GLfloat camPos[] = { 0, y, 0, 1 };
             glLightfv( GL_LIGHT1, GL_POSITION, camPos );
 
             // Rotate the scene for the next run.
             glRotatef(             45, 1, 0, 0 );
             glRotatef( World::zRotDeg, 0, 0, 1 );
 
-            float z;
-            if( player->plat && player->prevPlat  )
-                z = player->prevPlat->s.z() + (player->plat->s.z()-player->prevPlat->s.z())*player->jump_completion();
-            else
-                z = player->s.z();
+            float x = 0;
+            float z = 0;
+            if( player ) {
+                y = -player->s.y();
+                x = -player->s.x();
+
+                if( player->plat && player->prevPlat  )
+                    z = player->prevPlat->s.z() + 
+                        (player->plat->s.z()-player->prevPlat->s.z())*player->jump_completion();
+                else
+                    z = player->s.z();
+            }
 
             // Center the camera on the player.
-            glTranslatef( -player->s.x(), -player->s.y(), -z );
+            glTranslatef( x, y, -z );
         }
         
         if( paused )
