@@ -10,31 +10,8 @@ Texture Player::img;
 std::weak_ptr< Player > Player::weakPlayer;
 
 Player::Player( Platform* p )
+    : Jumper( p )
 {
-    prevPlat = plat = p;
-    maxJumpCoolDown = 800;
-    jumpCoolDown = maxJumpCoolDown;
-}
-
-void lighten_plat( Platform* plat, float brighten )
-{
-    if( brighten > 0.01 && plat->lightAdd < brighten ) {
-        plat->lightAdd = brighten;
-        brighten -= 0.5;
-
-        for( size_t i=0; i < plat->adjacents.size(); i++ )
-            lighten_plat( plat->adjacents[i], brighten );
-    }
-}
-
-void darken_plat( Platform* plat )
-{
-    if( plat->lightAdd > 0.01 ) {
-        plat->lightAdd = 0;
-
-        for( size_t i=0; i < plat->adjacents.size(); i++ )
-            darken_plat( plat->adjacents[i] );
-    }
 }
 
 Platform* Player::choose_next_plat()
@@ -50,6 +27,7 @@ Platform* Player::choose_next_plat()
     if( Keyboard::key_down('d') )
         input.x() +=  1;
 
+    Platform* next = 0;
     if( magnitude(input) > 0.01f ) 
     {
         // Input is rotated to match perspective.
@@ -73,61 +51,15 @@ Platform* Player::choose_next_plat()
             }
         }
 
-        Platform* next;
 
         if( nextPlat && minAngle < 3.14 / 4 )
             next = nextPlat;
         else
             next = 0;
-
-        return next;
     }
+
+    return next;
 }
-
-void Player::move( float dt )
-{
-    if( ! plat ) {
-        s.z( 1000 );
-        return;
-    }
-
-    if( ! prevPlat )
-        prevPlat = plat;
-
-    jumpCoolDown = std::max( jumpCoolDown-dt, 0.f );
-
-    if( jumpCoolDown <= 0 ) {
-        auto next = choose_next_plat();
-
-        if( next ) {
-            darken_plat( plat );
-
-            prevPlat = plat;
-            plat     = next;
-
-            maxJumpCoolDown = 600 * plat->height() / prevPlat->height();
-            if( maxJumpCoolDown < 100 )
-                maxJumpCoolDown = 100;
-
-            jumpCoolDown = maxJumpCoolDown;
-        }
-    }
-
-    float deltaZ = plat->height() - prevPlat->height();
-    float dz     = plat->height() / prevPlat->height();
-
-    Vector<float,2> d2 = plat->s - prevPlat->s;
-    Vector<float,3> s0( prevPlat->s.x(), prevPlat->s.y(), prevPlat->height() );
-    Vector<float,3> d3( d2.x(), d2.y(), deltaZ ); 
-
-    s = s0 + d3 * jump_completion();
-
-    float tmp = std::sin( 3.14 * jump_completion() );
-    s.z() += 75 * dz * std::sqrt(tmp);
-
-    lighten_plat( plat, 0.9 );
-}
-
 
 void Player::draw()
 {
