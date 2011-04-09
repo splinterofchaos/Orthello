@@ -43,6 +43,88 @@ typedef std::shared_ptr<Jumper> ActorPtr;
 typedef std::vector< ActorPtr > Actors;
 Actors actors;
 
+struct Dog : public Jumper
+{
+    static Texture img;
+
+    Dog( Platform* p )
+        : Jumper( p )
+    {
+    }
+
+    Platform* choose_next_plat()
+    {
+        std::shared_ptr<Player> pl = Player::weakPlayer.lock();
+
+        if( !pl )
+            return 0;
+        
+        Vector<float,3> targetDir3 = pl->s - s;
+        Vector<float,2> targetDir( targetDir3.x(), targetDir3.y() );
+
+        Platform* nextPlat = 0;
+        float minAngle = 366;
+        for( size_t i=0; i < plat->adjacents.size(); i++ ) 
+        {
+            Vector<float,2> d = plat->adjacents[i]->s - plat->s;
+
+            float angle = angle_between( targetDir, d );
+            if( angle < minAngle ) {
+                minAngle = angle;
+                nextPlat = plat->adjacents[i];
+            }
+        }
+
+        return nextPlat;
+    }
+
+    void draw()
+    {
+        glPushMatrix();
+
+        glTranslatef( s.x(), s.y(), s.z() );
+
+        glRotatef( -World::zRotDeg, 0, 0, 1 ); // Face the camera.
+        glRotatef( 90, 1, 0, 0 ); // Stand up so the XY-plane is vertical.
+
+        // Since X and Y are verticle now, ignore Z.
+        // Remember, this is only for the left side.
+
+        draw::Verts<   Vector<float,2> > verts {
+            vector( -10.f,  0.f ),
+            vector(   0.f,  0.f ),
+            vector(   0.f, 30.f ),
+            vector( -10.f, 30.f ),
+
+            vector(  10.f,  0.f ),
+            vector(   0.f,  0.f ),
+            vector(   0.f, 30.f ),
+            vector(  10.f, 30.f ),
+        };   
+
+        draw::TexCoords< Vector<int,2> > coords {
+            vector( 0, 1 ),
+            vector( 1, 1 ),
+            vector( 1, 0 ),
+            vector( 0, 0 ),
+
+            vector( 0, 1 ),
+            vector( 1, 1 ),
+            vector( 1, 0 ),
+            vector( 0, 0 ),
+        };
+
+        coords.texture = img.handle();
+
+        glColor3f( 1, 1, 1 );
+
+        draw::draw( verts, coords );
+
+        glPopMatrix();
+    }
+};
+Texture Dog::img;
+
 int main( int, char** )
 {
     const int IDEAL_FRAME_TIME = Timer::SECOND / 60;
@@ -68,6 +150,7 @@ int main( int, char** )
     //Player::weakPlayer = player;
 
     Player::img.load( "art/Wizzard.bmp" );
+    Dog::img.load(    "art/Dog.bmp" );
 
     Timer frameTimer;
     while( quit == false )
@@ -173,6 +256,10 @@ int main( int, char** )
                     std::shared_ptr<Player> pl( new Player(randPlat) );
                     actors.push_back( pl );
                     Player::weakPlayer = pl;
+
+                    randPlat = &platforms[ random(0, platforms.size() ) ];
+
+                    actors.push_back( ActorPtr(new Dog(randPlat)) );
                 }
             } // If growing.
             else
