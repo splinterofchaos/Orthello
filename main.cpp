@@ -39,7 +39,7 @@ void keyboard_events()
 typedef std::vector< Platform > Platforms;
 Platforms platforms;
 
-typedef std::shared_ptr<Player> ActorPtr;
+typedef std::shared_ptr<Jumper> ActorPtr;
 typedef std::vector< ActorPtr > Actors;
 Actors actors;
 
@@ -169,8 +169,10 @@ int main( int, char** )
 
                 if( ! growing ) {
                     Platform* randPlat = &platforms[ random(0, platforms.size() ) ];
-                    actors.push_back( ActorPtr(new Player(randPlat)) );
-                    Player::weakPlayer = actors.back();
+
+                    std::shared_ptr<Player> pl( new Player(randPlat) );
+                    actors.push_back( pl );
+                    Player::weakPlayer = pl;
                 }
             } // If growing.
             else
