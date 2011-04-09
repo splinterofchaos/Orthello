@@ -78,6 +78,11 @@ struct Dog : public Jumper
         return nextPlat;
     }
 
+    void on_collide( std::shared_ptr<Jumper> other )
+    {
+        // Do nothing... for now.
+    }
+
     void draw()
     {
         glPushMatrix();
@@ -264,8 +269,17 @@ int main( int, char** )
             } // If growing.
             else
             {
+                // Update all.
                 for( size_t i=0; i < actors.size(); i++ )
                     actors[i]->move( DT );
+
+                // Check and respond to collisions.
+                for( size_t i=0; i < actors.size(); i++ )
+                    for( size_t j=i+1; j < actors.size(); j++ )
+                        if( actors[i]->plat == actors[j]->plat ) {
+                            actors[i]->on_collide( actors[j] );
+                            actors[j]->on_collide( actors[i] );
+                        }
 
                 if( player && player->plat ) {
                     const float SCALE_FACTOR = 0.02;
@@ -275,6 +289,10 @@ int main( int, char** )
                 }
             }
         } // For each timestep.
+
+        for( size_t i=0; i < actors.size(); i++ )
+            if( actors[i]->deleteMe )
+                actors.erase( actors.begin() + i );
 
         for( size_t i=0; i < platforms.size(); i++ )
             platforms[i].draw();
