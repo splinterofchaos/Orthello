@@ -30,76 +30,93 @@ void Platform::draw()
     typedef Vector<float,3> Vec3;
 
     // TOP MAP
-    // 0-1-2
-    // | | |
-    // 3-4-5
-    // | | |
-    // 6-7-8
+    //
+    // Top view   Side view
+    // 1-----2      _____  -
+    // |\   /|     /     \ | SLOPE_H
+    // | 3-4 |     ------- -
+    // | | | |    |-|
+    // | 5-6 |    SLOPE_W
+    // |/   \|
+    // 7_____8
+
+    const float SLOPE_H = 0.6;
+    const float SLOPE_W = 0.5;
 
     draw::Verts< Vec3 > top {
-        Vec3(      0,      0, z     ), // 4
-        Vec3( -scale,      0, z*0.8 ), // 3
-        Vec3( -scale, -scale, z*0.8 ), // 0
-        Vec3(      0, -scale, z*0.8 ), // 1
+        Vec3( -scale, -scale, z*SLOPE_H ),         // 1
+        Vec3(  scale, -scale, z*SLOPE_H ),         // 2
+        Vec3(  scale*SLOPE_W, -scale*SLOPE_W, z ), // 4
+        Vec3( -scale*SLOPE_W, -scale*SLOPE_W, z ), // 3 
 
-        Vec3(      0,      0, z     ), // 4
-        Vec3(      0, -scale, z*0.8 ), // 1
-        Vec3(  scale, -scale, z*0.8 ), // 2
-        Vec3(  scale,      0, z*0.8 ), // 5
+        Vec3( -scale,  scale, z*SLOPE_H ),         // 7
+        Vec3( -scale, -scale, z*SLOPE_H ),         // 1
+        Vec3( -scale*SLOPE_W, -scale*SLOPE_W, z ), // 3 
+        Vec3( -scale*SLOPE_W,  scale*SLOPE_W, z ), // 5
 
-        Vec3(      0,      0, z     ), // 4
-        Vec3(      0,  scale, z*0.8 ), // 7
-        Vec3( -scale,  scale, z*0.8 ), // 6
-        Vec3( -scale,      0, z*0.8 ), // 3
+        Vec3(  scale, -scale, z*SLOPE_H ),         // 2
+        Vec3(  scale,  scale, z*SLOPE_H ),         // 8
+        Vec3(  scale*SLOPE_W,  scale*SLOPE_W, z ), // 6
+        Vec3(  scale*SLOPE_W, -scale*SLOPE_W, z ), // 4
 
-        Vec3(      0,      0, z     ), // 4
-        Vec3(  scale,      0, z*0.8 ), // 5
-        Vec3(  scale,  scale, z*0.8 ), // 8
-        Vec3(      0,  scale, z*0.8 ), // 7
+        Vec3(  scale,  scale, z*SLOPE_H ),         // 8
+        Vec3( -scale,  scale, z*SLOPE_H ),         // 7
+        Vec3( -scale*SLOPE_W,  scale*SLOPE_W, z ), // 5
+        Vec3(  scale*SLOPE_W,  scale*SLOPE_W, z ), // 6
+
+        Vec3( -scale*SLOPE_W, -scale*SLOPE_W, z ), // 3 
+        Vec3(  scale*SLOPE_W, -scale*SLOPE_W, z ), // 4
+        Vec3(  scale*SLOPE_W,  scale*SLOPE_W, z ), // 6
+        Vec3( -scale*SLOPE_W,  scale*SLOPE_W, z ), // 5
     };
 
     Vec3 topNorms[] = {
-        Vec3(  0,  0,   1 ), // 4
-        Vec3( -1,  0, 0.5 ), // 3
-        Vec3( -1, -1, 0.5 ), // 0
-        Vec3(  0, -1, 0.5 ), // 1
-                                 
-        Vec3(  0,  0,   1 ), // 4
-        Vec3(  0, -1, 0.5 ), // 1
-        Vec3(  1, -1, 0.5 ), // 2
-        Vec3(  1,  0, 0.5 ), // 5
-                                 
-        Vec3(  0,  0,   1 ), // 4
-        Vec3(  0,  1, 0.5 ), // 7
-        Vec3( -1,  1, 0.5 ), // 6
-        Vec3( -1,  0, 0.5 ), // 3
-                                 
-        Vec3(  0,  0,   1 ), // 4
-        Vec3(  1,  0, 0.5 ), // 5
-        Vec3(  1,  1, 0.5 ), // 8
-        Vec3(  0,  1, 0.5 ), // 7
+        Vec3( 0, -1, 0 ), // 1
+        Vec3( 0, -1, 0 ), // 2
+        Vec3( 0, -1, 0.5 ), // 4
+        Vec3( 0, -1, 0.5 ), // 3 
+
+        Vec3( -1, 0, 0 ), // 7
+        Vec3( -1, 0, 0 ), // 1
+        Vec3( -1, 0, 0.5 ), // 3 
+        Vec3( -1, 0, 0.5 ), // 5
+
+        Vec3( 1, 0, 0 ), // 2
+        Vec3( 1, 0, 0 ), // 8
+        Vec3( 1, 0, 0.5 ), // 6
+        Vec3( 1, 0, 0.5 ), // 4
+
+        Vec3( 0, 1, 0 ), // 8
+        Vec3( 0, 1, 0 ), // 7
+        Vec3( 0, 1, 0.5 ), // 5
+        Vec3( 0, 1, 0.5 ), // 6
+
+        Vec3( 0, 0, 1 ), // 3 
+        Vec3( 0, 0, 1 ), // 4
+        Vec3( 0, 0, 1 ), // 5
+        Vec3( 0, 0, 1 ), // 6
     };
 
     draw::Verts< Vec3 > side {
-        Vec3( -scale, -scale, z*0.8 ),
-        Vec3( -scale,  scale, z*0.8 ),
-        Vec3( -scale,  scale,  -100 ),
-        Vec3( -scale, -scale,  -100 ),
+        Vec3( -scale, -scale, z*SLOPE_H ),
+        Vec3( -scale,  scale, z*SLOPE_H ),
+        Vec3( -scale,  scale,      -100 ),
+        Vec3( -scale, -scale,      -100 ),
 
-        Vec3( -scale, -scale, z*0.8 ),
-        Vec3(  scale, -scale, z*0.8 ),
-        Vec3(  scale, -scale,  -100 ),
-        Vec3( -scale, -scale,  -100 ),
+        Vec3( -scale, -scale, z*SLOPE_H ),
+        Vec3(  scale, -scale, z*SLOPE_H ),
+        Vec3(  scale, -scale,      -100 ),
+        Vec3( -scale, -scale,      -100 ),
 
-        Vec3(  scale, -scale, z*0.8 ),
-        Vec3(  scale,  scale, z*0.8 ),
-        Vec3(  scale,  scale,  -100 ),
-        Vec3(  scale, -scale,  -100 ),
+        Vec3(  scale, -scale, z*SLOPE_H ),
+        Vec3(  scale,  scale, z*SLOPE_H ),
+        Vec3(  scale,  scale,      -100 ),
+        Vec3(  scale, -scale,      -100 ),
 
-        Vec3( -scale,  scale, z*0.8 ),
-        Vec3(  scale,  scale, z*0.8 ),
-        Vec3(  scale,  scale,  -100 ),
-        Vec3( -scale,  scale,  -100 ),
+        Vec3( -scale,  scale, z*SLOPE_H ),
+        Vec3(  scale,  scale, z*SLOPE_H ),
+        Vec3(  scale,  scale,      -100 ),
+        Vec3( -scale,  scale,      -100 ),
     };
 
     Vec3 wallNorms[] = {
