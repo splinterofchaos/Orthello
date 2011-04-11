@@ -44,101 +44,101 @@ void Platform::draw()
     const float SLOPE_W = 0.5;
 
     draw::Verts< Vec3 > top {
-        Vec3( -scale, -scale, z*SLOPE_H ),         // 1
-        Vec3(  scale, -scale, z*SLOPE_H ),         // 2
-        Vec3(  scale*SLOPE_W, -scale*SLOPE_W, z ), // 4
-        Vec3( -scale*SLOPE_W, -scale*SLOPE_W, z ), // 3 
+        { -scale, -scale, z*SLOPE_H },         // 1
+        {  scale, -scale, z*SLOPE_H },         // 2
+        {  scale*SLOPE_W, -scale*SLOPE_W, z }, // 4
+        { -scale*SLOPE_W, -scale*SLOPE_W, z }, // 3 
 
-        Vec3( -scale,  scale, z*SLOPE_H ),         // 7
-        Vec3( -scale, -scale, z*SLOPE_H ),         // 1
-        Vec3( -scale*SLOPE_W, -scale*SLOPE_W, z ), // 3 
-        Vec3( -scale*SLOPE_W,  scale*SLOPE_W, z ), // 5
+        { -scale,  scale, z*SLOPE_H },         // 7
+        { -scale, -scale, z*SLOPE_H },         // 1
+        { -scale*SLOPE_W, -scale*SLOPE_W, z }, // 3 
+        { -scale*SLOPE_W,  scale*SLOPE_W, z }, // 5
 
-        Vec3(  scale, -scale, z*SLOPE_H ),         // 2
-        Vec3(  scale,  scale, z*SLOPE_H ),         // 8
-        Vec3(  scale*SLOPE_W,  scale*SLOPE_W, z ), // 6
-        Vec3(  scale*SLOPE_W, -scale*SLOPE_W, z ), // 4
+        {  scale, -scale, z*SLOPE_H },         // 2
+        {  scale,  scale, z*SLOPE_H },         // 8
+        {  scale*SLOPE_W,  scale*SLOPE_W, z }, // 6
+        {  scale*SLOPE_W, -scale*SLOPE_W, z }, // 4
 
-        Vec3(  scale,  scale, z*SLOPE_H ),         // 8
-        Vec3( -scale,  scale, z*SLOPE_H ),         // 7
-        Vec3( -scale*SLOPE_W,  scale*SLOPE_W, z ), // 5
-        Vec3(  scale*SLOPE_W,  scale*SLOPE_W, z ), // 6
+        {  scale,  scale, z*SLOPE_H },         // 8
+        { -scale,  scale, z*SLOPE_H },         // 7
+        { -scale*SLOPE_W,  scale*SLOPE_W, z }, // 5
+        {  scale*SLOPE_W,  scale*SLOPE_W, z }, // 6
 
-        Vec3( -scale*SLOPE_W, -scale*SLOPE_W, z ), // 3 
-        Vec3(  scale*SLOPE_W, -scale*SLOPE_W, z ), // 4
-        Vec3(  scale*SLOPE_W,  scale*SLOPE_W, z ), // 6
-        Vec3( -scale*SLOPE_W,  scale*SLOPE_W, z ), // 5
+        { -scale*SLOPE_W, -scale*SLOPE_W, z }, // 3 
+        {  scale*SLOPE_W, -scale*SLOPE_W, z }, // 4
+        {  scale*SLOPE_W,  scale*SLOPE_W, z }, // 6
+        { -scale*SLOPE_W,  scale*SLOPE_W, z }, // 5
     };
 
     Vec3 topNorms[] = {
-        Vec3( 0, -1, 0 ), // 1
-        Vec3( 0, -1, 0 ), // 2
-        Vec3( 0, -1, 0.5 ), // 4
-        Vec3( 0, -1, 0.5 ), // 3 
+        { 0.f, -1.f, 0.0f }, // 1
+        { 0.f, -1.f, 0.0f }, // 2
+        { 0.f, -1.f, 0.5f }, // 4
+        { 0.f, -1.f, 0.5f }, // 3 
 
-        Vec3( -1, 0, 0 ), // 7
-        Vec3( -1, 0, 0 ), // 1
-        Vec3( -1, 0, 0.5 ), // 3 
-        Vec3( -1, 0, 0.5 ), // 5
+        { -1.f, 0.f, 0.0f }, // 7
+        { -1.f, 0.f, 0.0f }, // 1
+        { -1.f, 0.f, 0.5f }, // 3 
+        { -1.f, 0.f, 0.5f }, // 5
 
-        Vec3( 1, 0, 0 ), // 2
-        Vec3( 1, 0, 0 ), // 8
-        Vec3( 1, 0, 0.5 ), // 6
-        Vec3( 1, 0, 0.5 ), // 4
+        { 1.f, 0.f, 0.0f }, // 2
+        { 1.f, 0.f, 0.0f }, // 8
+        { 1.f, 0.f, 0.5f }, // 6
+        { 1.f, 0.f, 0.5f }, // 4
 
-        Vec3( 0, 1, 0 ), // 8
-        Vec3( 0, 1, 0 ), // 7
-        Vec3( 0, 1, 0.5 ), // 5
-        Vec3( 0, 1, 0.5 ), // 6
+        { 0.f, 1.f, 0.0f }, // 8
+        { 0.f, 1.f, 0.0f }, // 7
+        { 0.f, 1.f, 0.5f }, // 5
+        { 0.f, 1.f, 0.5f }, // 6
 
-        Vec3( 0, 0, 1 ), // 3 
-        Vec3( 0, 0, 1 ), // 4
-        Vec3( 0, 0, 1 ), // 5
-        Vec3( 0, 0, 1 ), // 6
+        { 0.f, 0.f, 1.f }, // 3 
+        { 0.f, 0.f, 1.f }, // 4
+        { 0.f, 0.f, 1.f }, // 5
+        { 0.f, 0.f, 1.f }, // 6
     };
 
     draw::Verts< Vec3 > side {
-        Vec3( -scale, -scale, z*SLOPE_H ),
-        Vec3( -scale,  scale, z*SLOPE_H ),
-        Vec3( -scale,  scale,      -100 ),
-        Vec3( -scale, -scale,      -100 ),
+        { -scale, -scale, z*SLOPE_H },
+        { -scale,  scale, z*SLOPE_H },
+        { -scale,  scale,    -100.f },
+        { -scale, -scale,    -100.f },
 
-        Vec3( -scale, -scale, z*SLOPE_H ),
-        Vec3(  scale, -scale, z*SLOPE_H ),
-        Vec3(  scale, -scale,      -100 ),
-        Vec3( -scale, -scale,      -100 ),
+        { -scale, -scale, z*SLOPE_H },
+        {  scale, -scale, z*SLOPE_H },
+        {  scale, -scale,    -100.f },
+        { -scale, -scale,    -100.f },
 
-        Vec3(  scale, -scale, z*SLOPE_H ),
-        Vec3(  scale,  scale, z*SLOPE_H ),
-        Vec3(  scale,  scale,      -100 ),
-        Vec3(  scale, -scale,      -100 ),
+        {  scale, -scale, z*SLOPE_H },
+        {  scale,  scale, z*SLOPE_H },
+        {  scale,  scale,    -100.f },
+        {  scale, -scale,    -100.f },
 
-        Vec3( -scale,  scale, z*SLOPE_H ),
-        Vec3(  scale,  scale, z*SLOPE_H ),
-        Vec3(  scale,  scale,      -100 ),
-        Vec3( -scale,  scale,      -100 ),
+        { -scale,  scale, z*SLOPE_H },
+        {  scale,  scale, z*SLOPE_H },
+        {  scale,  scale,    -100.f },
+        { -scale,  scale,    -100.f },
     };
 
-    Vec3 wallNorms[] = {
-        Vec3( -1, 0, 0 ),
-        Vec3( -1, 0, 0 ),
-        Vec3( -1, 0, 0 ),
-        Vec3( -1, 0, 0 ),
+    Vector<float,3> wallNorms[] = {
+        { -1.f,  0.f,  0.f },
+        { -1.f,  0.f,  0.f },
+        { -1.f,  0.f,  0.f },
+        { -1.f,  0.f,  0.f },
 
-        Vec3( 0, -1, 0 ),
-        Vec3( 0, -1, 0 ),
-        Vec3( 0, -1, 0 ),
-        Vec3( 0, -1, 0 ),
+        {  0.f, -1.f,  0.f },
+        {  0.f, -1.f,  0.f },
+        {  0.f, -1.f,  0.f },
+        {  0.f, -1.f,  0.f },
 
-        Vec3(  1, 0, 0 ),
-        Vec3(  1, 0, 0 ),
-        Vec3(  1, 0, 0 ),
-        Vec3(  1, 0, 0 ),
+        {  1.f,  0.f,  0.f },
+        {  1.f,  0.f,  0.f },
+        {  1.f,  0.f,  0.f },
+        {  1.f,  0.f,  0.f },
         
-        Vec3( 0,  1, 0 ),
-        Vec3( 0,  1, 0 ),
-        Vec3( 0,  1, 0 ),
-        Vec3( 0,  1, 0 ),
+        {  0.f,  1.f,  0.f },
+        {  0.f,  1.f,  0.f },
+        {  0.f,  1.f,  0.f },
+        {  0.f,  1.f,  0.f },
     };
 
     glEnableClientState( GL_NORMAL_ARRAY );
