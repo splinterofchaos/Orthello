@@ -6,6 +6,9 @@
 
 #include <GL/gl.h>
 
+Platform::Vec Platform::unitCircle[ Platform::CIRCLE_SIZE ];
+bool  Platform::firstInit = true;
+
 Platform::Platform( const Vec& pos )
 {
     s = pos;
@@ -18,6 +21,17 @@ Platform::Platform( const Vec& pos )
     r = random( 0.0f, 0.4f );
     g = random( 0.4f, 1.0f );
     b = random( 0.0f, 0.2f );
+
+    if( firstInit )
+    {
+        for( size_t i=0; i < CIRCLE_SIZE; i++ )
+        {
+            float theta = float(i)/CIRCLE_SIZE * (2*3.14);
+            unitCircle[i] = vector( std::cos(theta), std::sin(theta) );
+        }
+
+        firstInit = false;
+    }
 }
 
 void Platform::draw()
@@ -43,32 +57,22 @@ void Platform::draw()
     const float SLOPE_H = 0.6;
     const float SLOPE_W = 0.5;
 
-    draw::Verts< Vec3 > top {
-        { -scale, -scale, z*SLOPE_H },         // 1
-        {  scale, -scale, z*SLOPE_H },         // 2
-        {  scale*SLOPE_W, -scale*SLOPE_W, z }, // 4
-        { -scale*SLOPE_W, -scale*SLOPE_W, z }, // 3 
+    Vector<float,3> circle[ CIRCLE_SIZE ];
+    for( size_t i=0; i < CIRCLE_SIZE; i++ )
+    {
+        circle[i].x() = unitCircle[i].x() * scale;
+        circle[i].y() = unitCircle[i].y() * scale;
+        circle[i].z( z );
+    }
 
-        { -scale,  scale, z*SLOPE_H },         // 7
-        { -scale, -scale, z*SLOPE_H },         // 1
-        { -scale*SLOPE_W, -scale*SLOPE_W, z }, // 3 
-        { -scale*SLOPE_W,  scale*SLOPE_W, z }, // 5
+    Vector<float,3> sideV[ CIRCLE_SIZE * 2 ];
+    for( size_t i=0; i < CIRCLE_SIZE; i++ )
+    {
+        sideV[i*2] = sideV[i*2+1] = circle[i];
+        sideV[i*2+1].z() = -100;
+    }
 
-        {  scale, -scale, z*SLOPE_H },         // 2
-        {  scale,  scale, z*SLOPE_H },         // 8
-        {  scale*SLOPE_W,  scale*SLOPE_W, z }, // 6
-        {  scale*SLOPE_W, -scale*SLOPE_W, z }, // 4
-
-        {  scale,  scale, z*SLOPE_H },         // 8
-        { -scale,  scale, z*SLOPE_H },         // 7
-        { -scale*SLOPE_W,  scale*SLOPE_W, z }, // 5
-        {  scale*SLOPE_W,  scale*SLOPE_W, z }, // 6
-
-        { -scale*SLOPE_W, -scale*SLOPE_W, z }, // 3 
-        {  scale*SLOPE_W, -scale*SLOPE_W, z }, // 4
-        {  scale*SLOPE_W,  scale*SLOPE_W, z }, // 6
-        { -scale*SLOPE_W,  scale*SLOPE_W, z }, // 5
-    };
+    draw::Verts< Vec3 > top( circle, CIRCLE_SIZE );
 
     Vec3 topNorms[] = {
         { 0.f, -1.f, 0.0f }, // 1
@@ -97,27 +101,7 @@ void Platform::draw()
         { 0.f, 0.f, 1.f }, // 6
     };
 
-    draw::Verts< Vec3 > side {
-        { -scale, -scale, z*SLOPE_H },
-        { -scale,  scale, z*SLOPE_H },
-        { -scale,  scale,    -100.f },
-        { -scale, -scale,    -100.f },
-
-        { -scale, -scale, z*SLOPE_H },
-        {  scale, -scale, z*SLOPE_H },
-        {  scale, -scale,    -100.f },
-        { -scale, -scale,    -100.f },
-
-        {  scale, -scale, z*SLOPE_H },
-        {  scale,  scale, z*SLOPE_H },
-        {  scale,  scale,    -100.f },
-        {  scale, -scale,    -100.f },
-
-        { -scale,  scale, z*SLOPE_H },
-        {  scale,  scale, z*SLOPE_H },
-        {  scale,  scale,    -100.f },
-        { -scale,  scale,    -100.f },
-    };
+    draw::Verts< Vec3 > side( sideV, CIRCLE_SIZE*2 );
 
     Vector<float,3> wallNorms[] = {
         { -1.f,  0.f,  0.f },
@@ -146,7 +130,7 @@ void Platform::draw()
     glColor3f( r + lightAdd, g + lightAdd, b + lightAdd );
     glNormalPointer( GL_FLOAT, 0, topNorms );
 
-    draw::draw( top );
+    draw::draw( top, GL_POLYGON );
 
     float intensity = ( r + g + b ) / 3;
     intensity *= 2 * intensity;
@@ -154,7 +138,7 @@ void Platform::draw()
     glColor3f( 0.6, 0.5, 0 );
     glNormalPointer( GL_FLOAT, 0, wallNorms );
 
-    draw::draw( side );
+    draw::draw( side, GL_TRIANGLE_STRIP );
 
     glDisableClientState( GL_NORMAL_ARRAY );
 
