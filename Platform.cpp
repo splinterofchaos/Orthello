@@ -57,22 +57,32 @@ void Platform::draw()
     const float SLOPE_H = 0.6;
     const float SLOPE_W = 0.5;
 
-    Vector<float,3> circle[ CIRCLE_SIZE ];
+    Vector<float,3> circle[ CIRCLE_SIZE + 2 ];
+    circle[0] = vector( 0, 0, z );
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
     {
-        circle[i].x() = unitCircle[i].x() * scale;
-        circle[i].y() = unitCircle[i].y() * scale;
-        circle[i].z( z );
+        circle[i+1].x() = unitCircle[i].x() * scale;
+        circle[i+1].y() = unitCircle[i].y() * scale;
+        circle[i+1].z( z * SLOPE_H );
     }
+    circle[ CIRCLE_SIZE+1 ] = circle[1];
 
     Vector<float,3> sideV[ CIRCLE_SIZE * 2 ];
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
     {
-        sideV[i*2] = sideV[i*2+1] = circle[i];
+        sideV[i*2] = sideV[i*2+1] = circle[i+1];
         sideV[i*2+1].z() = -100;
     }
 
-    draw::Verts< Vec3 > top( circle, CIRCLE_SIZE );
+    Vector<float,3> wallN[ CIRCLE_SIZE * 2 ];
+    for( size_t i=0; i < CIRCLE_SIZE; i++ )
+    {
+        wallN[i*2].x() = wallN[i*2+1].x() = unitCircle[i].x();
+        wallN[i*2].y() = wallN[i*2+1].y() = unitCircle[i].y();
+        wallN[i*2].z() = wallN[i*2+1].z() = 0;
+    }
+
+    draw::Verts< Vec3 > top( circle, CIRCLE_SIZE+2 );
 
     Vec3 topNorms[] = {
         { 0.f, -1.f, 0.0f }, // 1
@@ -128,7 +138,7 @@ void Platform::draw()
     glEnableClientState( GL_NORMAL_ARRAY );
 
     glColor3f( r + lightAdd, g + lightAdd, b + lightAdd );
-    glNormalPointer( GL_FLOAT, 0, topNorms );
+    glNormalPointer( GL_FLOAT, 0, circle );
 
     draw::draw( top, GL_POLYGON );
 
@@ -136,7 +146,7 @@ void Platform::draw()
     intensity *= 2 * intensity;
 
     glColor3f( 0.6, 0.5, 0 );
-    glNormalPointer( GL_FLOAT, 0, wallNorms );
+    glNormalPointer( GL_FLOAT, 0, wallN );
 
     draw::draw( side, GL_TRIANGLE_STRIP );
 

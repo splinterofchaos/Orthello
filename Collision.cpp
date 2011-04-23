@@ -16,7 +16,7 @@ bool square_square_collision( const Square& s1, const Square& s2 )
     Vector<float,2> d = s1.s - s2.s;
     float scale = s1.scale + s2.scale;
 
-    return std::abs(d.x()) < scale && std::abs(d.y()) < scale;
+    return magnitude(d) < scale;
 }
 
 bool point_square_collision( const Vector<float,2>& p, const Square& s )
