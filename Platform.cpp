@@ -60,39 +60,51 @@ void Platform::draw()
     Vector<float,3> circleT[ CIRCLE_SIZE ];
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
     {
-        circleTop[i] = vector(
-            unitCircle[i].x(), unitCircle[i].y(), z 
-        );
+        circleT[i] = vector(
+            unitCircle[i].x(), unitCircle[i].y(), 0 
+        ) * scale * SLOPE_W;
+
+        circleT[i].z( z );
     }
 
     Vector<float,3> circle[ CIRCLE_SIZE * 2 + 2 ];
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
     {
-        circle[i*2+1].x() circle[i*2] = unitCircle[i].x();
-        circle[i*2+1].y() circle[i*2] = unitCircle[i].y();
-        circle[i*2] = z;
+        circle[i*2+1].x() = circle[i*2].x() = unitCircle[i].x();
+        circle[i*2+1].y() = circle[i*2].y() = unitCircle[i].y();
+
+        circle[i*2+1].x()   *= scale;
+        circle[i*2+1].y()   *= scale;
+        circle[i*2].x() *= scale * SLOPE_W;
+        circle[i*2].y() *= scale * SLOPE_W;
+
+        circle[i*2].z() = z;
         circle[i*2+1].z( z * SLOPE_H );
     }
-    circle[ CIRCLE_SIZE   ] = circle[0];
-    circle[ CIRCLE_SIZE+1 ] = circle[1];
+    circle[ CIRCLE_SIZE*2   ] = circle[0];
+    circle[ CIRCLE_SIZE*2+1 ] = circle[1];
 
-    Vector<float,3> sideV[ CIRCLE_SIZE * 2 ];
+    Vector<float,3> sideV[ CIRCLE_SIZE * 2 + 2 ];
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
     {
-        sideV[i*2] = sideV[i*2+1] = circle[i+1];
+        sideV[i*2] = sideV[i*2+1] = circle[i*2+1];
         sideV[i*2+1].z() = -100;
     }
+    sideV[CIRCLE_SIZE*2] = sideV[0];
+    sideV[CIRCLE_SIZE*2+1] = sideV[1];
 
-    Vector<float,3> wallN[ CIRCLE_SIZE * 2 ];
+    Vector<float,3> wallN[ CIRCLE_SIZE * 2 + 2 ];
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
     {
         wallN[i*2].x() = wallN[i*2+1].x() = unitCircle[i].x();
         wallN[i*2].y() = wallN[i*2+1].y() = unitCircle[i].y();
         wallN[i*2].z() = wallN[i*2+1].z() = 0;
     }
+    wallN[CIRCLE_SIZE*2]   = wallN[0];
+    wallN[CIRCLE_SIZE*2+1] = wallN[1];
 
     draw::Verts< Vec3 > veryTop( circleT, CIRCLE_SIZE );
-    draw::Verts< Vec3 > top( circle, CIRCLE_SIZE+2 );
+    draw::Verts< Vec3 > top( circle, CIRCLE_SIZE*2+2 );
 
     Vec3 topNorms[] = {
         { 0.f, -1.f, 0.0f }, // 1
@@ -121,7 +133,7 @@ void Platform::draw()
         { 0.f, 0.f, 1.f }, // 6
     };
 
-    draw::Verts< Vec3 > side( sideV, CIRCLE_SIZE*2 );
+    draw::Verts< Vec3 > side( sideV, CIRCLE_SIZE*2+2 );
 
     Vector<float,3> wallNorms[] = {
         { -1.f,  0.f,  0.f },
@@ -145,15 +157,15 @@ void Platform::draw()
         {  0.f,  1.f,  0.f },
     };
 
-    glEnableClientState( GL_NORMAL_ARRAY );
 
     glColor3f( r + lightAdd, g + lightAdd, b + lightAdd );
 
-    glNormalPointer( GL_FLOAT, 0, circleT );
     draw::draw( veryTop, GL_POLYGON );
 
+    glEnableClientState( GL_NORMAL_ARRAY );
+
     glNormalPointer( GL_FLOAT, 0, circle );
-    draw::draw( top, GL_TRIANGLE_STRIP );
+    draw::draw( top, GL_QUAD_STRIP );
 
     float intensity = ( r + g + b ) / 3;
     intensity *= 2 * intensity;
