@@ -54,8 +54,8 @@ void Platform::draw()
     // |/   \|
     // 7_____8
 
-    const float SLOPE_H = 0.6;
-    const float SLOPE_W = 0.5;
+    const float SLOPE_H = 0.7;
+    const float SLOPE_W = 0.75;
 
     Vector<float,3> circleT[ CIRCLE_SIZE ];
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
