@@ -10,6 +10,7 @@ class Platform : public Square
 {
     static const unsigned int CIRCLE_SIZE = 60;
     static Vector<float,2> unitCircle[ CIRCLE_SIZE ];
+    static Vector<float,3> topNorms[ CIRCLE_SIZE ];
 
     static bool firstInit;
 

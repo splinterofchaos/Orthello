@@ -6,8 +6,9 @@
 
 #include <GL/gl.h>
 
-Platform::Vec Platform::unitCircle[ Platform::CIRCLE_SIZE ];
-bool  Platform::firstInit = true;
+Vector<float,2> Platform::unitCircle[ Platform::CIRCLE_SIZE ];
+Vector<float,3> Platform::topNorms[ Platform::CIRCLE_SIZE ];
+bool Platform::firstInit = true;
 
 Platform::Platform( const Vec& pos )
 {
@@ -28,6 +29,8 @@ Platform::Platform( const Vec& pos )
         {
             float theta = float(i)/CIRCLE_SIZE * (2*3.14);
             unitCircle[i] = vector( std::cos(theta), std::sin(theta) );
+
+            topNorms[i] = vector( 0, 0, 1 );
         }
 
         firstInit = false;
@@ -105,66 +108,16 @@ void Platform::draw()
 
     draw::Verts< Vec3 > veryTop( circleT, CIRCLE_SIZE );
     draw::Verts< Vec3 > top( circle, CIRCLE_SIZE*2+2 );
-
-    Vec3 topNorms[] = {
-        { 0.f, -1.f, 0.0f }, // 1
-        { 0.f, -1.f, 0.0f }, // 2
-        { 0.f, -1.f, 0.5f }, // 4
-        { 0.f, -1.f, 0.5f }, // 3 
-
-        { -1.f, 0.f, 0.0f }, // 7
-        { -1.f, 0.f, 0.0f }, // 1
-        { -1.f, 0.f, 0.5f }, // 3 
-        { -1.f, 0.f, 0.5f }, // 5
-
-        { 1.f, 0.f, 0.0f }, // 2
-        { 1.f, 0.f, 0.0f }, // 8
-        { 1.f, 0.f, 0.5f }, // 6
-        { 1.f, 0.f, 0.5f }, // 4
-
-        { 0.f, 1.f, 0.0f }, // 8
-        { 0.f, 1.f, 0.0f }, // 7
-        { 0.f, 1.f, 0.5f }, // 5
-        { 0.f, 1.f, 0.5f }, // 6
-
-        { 0.f, 0.f, 1.f }, // 3 
-        { 0.f, 0.f, 1.f }, // 4
-        { 0.f, 0.f, 1.f }, // 5
-        { 0.f, 0.f, 1.f }, // 6
-    };
-
     draw::Verts< Vec3 > side( sideV, CIRCLE_SIZE*2+2 );
 
-    Vector<float,3> wallNorms[] = {
-        { -1.f,  0.f,  0.f },
-        { -1.f,  0.f,  0.f },
-        { -1.f,  0.f,  0.f },
-        { -1.f,  0.f,  0.f },
-
-        {  0.f, -1.f,  0.f },
-        {  0.f, -1.f,  0.f },
-        {  0.f, -1.f,  0.f },
-        {  0.f, -1.f,  0.f },
-
-        {  1.f,  0.f,  0.f },
-        {  1.f,  0.f,  0.f },
-        {  1.f,  0.f,  0.f },
-        {  1.f,  0.f,  0.f },
-        
-        {  0.f,  1.f,  0.f },
-        {  0.f,  1.f,  0.f },
-        {  0.f,  1.f,  0.f },
-        {  0.f,  1.f,  0.f },
-    };
-
-
+    glNormalPointer( GL_FLOAT, 0, circle );
     glColor3f( r + lightAdd, g + lightAdd, b + lightAdd );
 
+    glNormalPointer( GL_FLOAT, 0, topNorms );
     draw::draw( veryTop, GL_POLYGON );
 
     glEnableClientState( GL_NORMAL_ARRAY );
 
-    glNormalPointer( GL_FLOAT, 0, circle );
     draw::draw( top, GL_QUAD_STRIP );
 
     float intensity = ( r + g + b ) / 3;
