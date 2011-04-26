@@ -46,72 +46,79 @@ void Platform::draw_circlular_plat()
 
     float z = height();
 
-    Vector<float,3> circleT[ CIRCLE_SIZE ];
+    Vector<float,3> topVerts[ CIRCLE_SIZE ];
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
     {
-        circleT[i] = vector(
+        topVerts[i] = vector(
             unitCircle[i].x(), unitCircle[i].y(), 0 
         ) * scale * SLOPE_W;
 
-        circleT[i].z( z );
+        topVerts[i].z( z );
     }
 
-    Vector<float,3> circle[ CIRCLE_SIZE * 2 + 2 ];
+    Vector<float,3> slopeVerts[ CIRCLE_SIZE * 2 + 2 ];
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
     {
-        circle[i*2+1].x() = circle[i*2].x() = unitCircle[i].x();
-        circle[i*2+1].y() = circle[i*2].y() = unitCircle[i].y();
+        slopeVerts[i*2+1].x() = slopeVerts[i*2].x() = unitCircle[i].x();
+        slopeVerts[i*2+1].y() = slopeVerts[i*2].y() = unitCircle[i].y();
 
-        circle[i*2+1].x()   *= scale;
-        circle[i*2+1].y()   *= scale;
-        circle[i*2].x() *= scale * SLOPE_W;
-        circle[i*2].y() *= scale * SLOPE_W;
+        slopeVerts[i*2+1].x()   *= scale;
+        slopeVerts[i*2+1].y()   *= scale;
+        slopeVerts[i*2].x() *= scale * SLOPE_W;
+        slopeVerts[i*2].y() *= scale * SLOPE_W;
 
-        circle[i*2].z() = z;
-        circle[i*2+1].z( z * SLOPE_H );
+        slopeVerts[i*2].z() = z;
+        slopeVerts[i*2+1].z( z * SLOPE_H );
     }
-    circle[ CIRCLE_SIZE*2   ] = circle[0];
-    circle[ CIRCLE_SIZE*2+1 ] = circle[1];
+    slopeVerts[ CIRCLE_SIZE*2   ] = slopeVerts[0];
+    slopeVerts[ CIRCLE_SIZE*2+1 ] = slopeVerts[1];
 
-    Vector<float,3> sideV[ CIRCLE_SIZE * 2 + 2 ];
+    Vector<float,3> slopeNorms[ CIRCLE_SIZE * 2 + 2 ];
+    float theta = std::atan( SLOPE_H/(scale-SLOPE_W) );
+    float xyPart = std::cos( theta );
+    float zPart  = std::sin( theta );
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
     {
-        sideV[i*2] = sideV[i*2+1] = circle[i*2+1];
-        sideV[i*2+1].z() = -100;
+        slopeNorms[i*2] = slopeNorms[i*2+1] = vector (
+            unitCircle[i].x()*xyPart, unitCircle[i].y()*xyPart, zPart
+        );
     }
-    sideV[CIRCLE_SIZE*2] = sideV[0];
-    sideV[CIRCLE_SIZE*2+1] = sideV[1];
+    slopeNorms[CIRCLE_SIZE*2] = slopeNorms[CIRCLE_SIZE*2+1] = slopeNorms[0];
 
-    Vector<float,3> wallN[ CIRCLE_SIZE * 2 + 2 ];
+    Vector<float,3> sideVerts[ CIRCLE_SIZE * 2 + 2 ];
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
     {
-        wallN[i*2].x() = wallN[i*2+1].x() = unitCircle[i].x();
-        wallN[i*2].y() = wallN[i*2+1].y() = unitCircle[i].y();
-        wallN[i*2].z() = wallN[i*2+1].z() = 0;
+        sideVerts[i*2] = sideVerts[i*2+1] = slopeVerts[i*2+1];
+        sideVerts[i*2+1].z() = -100;
     }
-    wallN[CIRCLE_SIZE*2]   = wallN[0];
-    wallN[CIRCLE_SIZE*2+1] = wallN[1];
+    sideVerts[CIRCLE_SIZE*2] = sideVerts[0];
+    sideVerts[CIRCLE_SIZE*2+1] = sideVerts[1];
 
-    draw::Verts< Vec3 > veryTop( circleT, CIRCLE_SIZE );
-    draw::Verts< Vec3 > top( circle, CIRCLE_SIZE*2+2 );
-    draw::Verts< Vec3 > side( sideV, CIRCLE_SIZE*2+2 );
+    Vector<float,3> sideNorms[ CIRCLE_SIZE * 2 + 2 ];
+    for( size_t i=0; i < CIRCLE_SIZE; i++ )
+    {
+        sideNorms[i*2].x() = sideNorms[i*2+1].x() = unitCircle[i].x();
+        sideNorms[i*2].y() = sideNorms[i*2+1].y() = unitCircle[i].y();
+        sideNorms[i*2].z() = sideNorms[i*2+1].z() = 0;
+    }
+    sideNorms[CIRCLE_SIZE*2]   = sideNorms[0];
+    sideNorms[CIRCLE_SIZE*2+1] = sideNorms[1];
 
-    glNormalPointer( GL_FLOAT, 0, circle );
-    glColor3f( r + lightAdd, g + lightAdd, b + lightAdd );
-
-    glNormalPointer( GL_FLOAT, 0, topNorms );
-    draw::draw( veryTop, GL_POLYGON );
+    draw::Verts< Vec3 > top(   topVerts, CIRCLE_SIZE );
+    draw::Verts< Vec3 > slope( slopeVerts, CIRCLE_SIZE*2+2 );
+    draw::Verts< Vec3 > side(  sideVerts, CIRCLE_SIZE*2+2 );
 
     glEnableClientState( GL_NORMAL_ARRAY );
 
-    draw::draw( top, GL_QUAD_STRIP );
+    glColor3f( r + lightAdd, g + lightAdd, b + lightAdd );
+    glNormalPointer( GL_FLOAT, 0, topNorms );
+    draw::draw( top, GL_POLYGON );
 
-    float intensity = ( r + g + b ) / 3;
-    intensity *= 2 * intensity;
+    glNormalPointer( GL_FLOAT, 0, slopeNorms );
+    draw::draw( slope, GL_QUAD_STRIP );
 
     glColor3f( 0.6, 0.5, 0 );
-    glNormalPointer( GL_FLOAT, 0, wallN );
-
+    glNormalPointer( GL_FLOAT, 0, sideNorms );
     draw::draw( side, GL_TRIANGLE_STRIP );
 
     glDisableClientState( GL_NORMAL_ARRAY );
