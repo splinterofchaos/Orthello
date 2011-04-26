@@ -39,6 +39,97 @@ void keyboard_events()
 typedef std::vector< Platform > Platforms;
 Platforms platforms;
 
+typedef std::shared_ptr<Jumper> ActorPtr;
+typedef std::vector< ActorPtr > Actors;
+Actors actors;
+
+struct Dog : public Jumper
+{
+    static Texture img;
+
+    Dog( Platform* p )
+        : Jumper( p )
+    {
+    }
+
+    Platform* choose_next_plat()
+    {
+        std::shared_ptr<Player> pl = Player::weakPlayer.lock();
+
+        if( !pl )
+            return 0;
+        
+        Vector<float,3> targetDir3 = pl->s - s;
+        Vector<float,2> targetDir( targetDir3.x(), targetDir3.y() );
+
+        Platform* nextPlat = 0;
+        float minAngle = 366;
+        for( size_t i=0; i < plat->adjacents.size(); i++ ) 
+        {
+            Vector<float,2> d = plat->adjacents[i]->s - plat->s;
+
+            float angle = angle_between( targetDir, d );
+            if( angle < minAngle ) {
+                minAngle = angle;
+                nextPlat = plat->adjacents[i];
+            }
+        }
+
+        return nextPlat;
+    }
+
+    void on_collide( std::shared_ptr<Jumper> other )
+    {
+        // Do nothing... for now.
+    }
+
+    void draw()
+    {
+        glPushMatrix();
+
+        glTranslatef( s.x(), s.y(), s.z() );
+
+        glRotatef( -World::zRotDeg, 0, 0, 1 ); // Face the camera.
+        glRotatef( 90, 1, 0, 0 ); // Stand up so the XY-plane is vertical.
+
+        // Since X and Y are verticle now, ignore Z.
+        // Remember, this is only for the left side.
+
+        draw::Verts<   Vector<float,2> > verts {
+            vector( -10.f,  0.f ),
+            vector(   0.f,  0.f ),
+            vector(   0.f, 30.f ),
+            vector( -10.f, 30.f ),
+
+            vector(  10.f,  0.f ),
+            vector(   0.f,  0.f ),
+            vector(   0.f, 30.f ),
+            vector(  10.f, 30.f ),
+        };   
+
+        draw::TexCoords< Vector<int,2> > coords {
+            vector( 0, 1 ),
+            vector( 1, 1 ),
+            vector( 1, 0 ),
+            vector( 0, 0 ),
+
+            vector( 0, 1 ),
+            vector( 1, 1 ),
+            vector( 1, 0 ),
+            vector( 0, 0 ),
+        };
+
+        coords.texture = img.handle();
+
+        glColor3f( 1, 1, 1 );
+
+        draw::draw( verts, coords );
+
+        glPopMatrix();
+    }
+};
+Texture Dog::img;
+
 int main( int, char** )
 {
     const int IDEAL_FRAME_TIME = Timer::SECOND / 60;
@@ -61,13 +152,16 @@ int main( int, char** )
         platforms.push_back( Platform( pos ) );
     }
 
-    Player player;
+    //Player::weakPlayer = player;
 
     Player::img.load( "art/Wizzard.bmp" );
+    Dog::img.load(    "art/Dog.bmp" );
 
     Timer frameTimer;
     while( quit == false )
     {
+        std::shared_ptr<Player> player = Player::weakPlayer.lock();
+        
         Keyboard::update();
 
         static SDL_Event event;
@@ -148,26 +242,50 @@ int main( int, char** )
                     } // For platforms[j].
                 } // For platforms[i].
 
-                if( ! growing )
-                    player.plat = &platforms[ random(0, platforms.size()) ];
+                if( ! growing ) {
+                    Platform* randPlat = &platforms[ random(0, platforms.size() ) ];
+
+                    std::shared_ptr<Player> pl( new Player(randPlat) );
+                    actors.push_back( pl );
+                    Player::weakPlayer = pl;
+
+                    randPlat = &platforms[ random(0, platforms.size() ) ];
+
+                    actors.push_back( ActorPtr(new Dog(randPlat)) );
+                }
             } // If growing.
             else
             {
-                player.move( DT );
+                // Update all.
+                for( size_t i=0; i < actors.size(); i++ )
+                    actors[i]->move( DT );
 
-                if( player.plat ) {
+                // Check and respond to collisions.
+                for( size_t i=0; i < actors.size(); i++ )
+                    for( size_t j=i+1; j < actors.size(); j++ )
+                        if( actors[i]->plat == actors[j]->plat ) {
+                            actors[i]->on_collide( actors[j] );
+                            actors[j]->on_collide( actors[i] );
+                        }
+
+                if( player && player->plat ) {
                     const float SCALE_FACTOR = 0.02;
-                    Screen::scale = player.prevPlat->scale + (player.plat->scale-player.prevPlat->scale)*player.jump_completion();
+                    Screen::scale = player->prevPlat->scale + (player->plat->scale-player->prevPlat->scale)*player->jump_completion();
                     Screen::scale *= SCALE_FACTOR;
                     resize_window( Screen::width, Screen::height, Screen::scale );
                 }
             }
         } // For each timestep.
 
+        for( size_t i=0; i < actors.size(); i++ )
+            if( actors[i]->deleteMe )
+                actors.erase( actors.begin() + i );
+
         for( size_t i=0; i < platforms.size(); i++ )
             platforms[i].draw();
 
-        player.draw();
+        for( size_t i=0; i < actors.size(); i++ )
+            actors[i]->draw();
 
         static Timer realTimer;
         realTimer.update();
@@ -178,20 +296,29 @@ int main( int, char** )
             glLoadIdentity();
 
             GLfloat camPos[] = { 0, 0, 0, 1 };
+
             glLightfv( GL_LIGHT1, GL_POSITION, camPos );
 
             // Rotate the scene for the next run.
             glRotatef(             45, 1, 0, 0 );
             glRotatef( World::zRotDeg, 0, 0, 1 );
 
-            float z;
-            if( player.plat && player.prevPlat  )
-                z = player.prevPlat->s.z() + (player.plat->s.z()-player.prevPlat->s.z())*player.jump_completion();
-            else
-                z = player.s.z();
+            float y = 0;
+            float x = 0;
+            float z = 0;
+            if( player ) {
+                y = -player->s.y();
+                x = -player->s.x();
+
+                if( player->plat && player->prevPlat  )
+                    z = player->prevPlat->s.z() + 
+                        (player->plat->s.z()-player->prevPlat->s.z())*player->jump_completion();
+                else
+                    z = player->s.z();
+            }
 
             // Center the camera on the player.
-            glTranslatef( -player.s.x(), -player.s.y(), -z );
+            glTranslatef( x, y, -z );
         }
         
         if( paused )

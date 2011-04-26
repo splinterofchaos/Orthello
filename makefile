@@ -23,7 +23,7 @@ CFLAGS  += -Wall -Wextra
 compile = ${CC} ${CFLAGS} ${EXTRA} -std=gnu++0x -c 
 link    = ${CC} ${CFLAGS} ${EXTRA} -std=gnu++0x -o ${OUT}
 
-OBJ = .Timer.o .Keyboard.o .Collision.o .Random.o .Player.o .Platform.o .Screen.o .Texture.o .World.o
+OBJ = .Timer.o .Keyboard.o .Collision.o .Random.o .Player.o .Platform.o .Screen.o .Texture.o .World.o .Jumper.o
 
 ${OUT} : ${OBJ} main.cpp Draw.* makefile 
 	${link} main.cpp -std=c++0x ${OBJ} ${LDFLAGS}
@@ -37,8 +37,11 @@ ${OUT} : ${OBJ} main.cpp Draw.* makefile
 .Texture.o : Texture.*
 	${compile} Texture.cpp   -o .Texture.o
 
-.Player.o : Player.* Texture.o
+.Jumper.o : Jumper.*
+	${compile} Jumper.cpp    -o .Jumper.o
+.Player.o : Player.* .Texture.o .Jumper.o
 	${compile} Player.cpp    -o .Player.o
+
 .Platform.o : Platform.*
 	${compile} Platform.cpp  -o .Platform.o
 

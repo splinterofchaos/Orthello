@@ -1,26 +1,22 @@
 
 #pragma once
 
-#include "Actor.h"
+#include "Jumper.h"
 #include "Texture.h"
 #include "Platform.h"
 
-struct Player
+#include <memory> // For weak_ptr.
+
+struct Player : public Jumper
 {
+    static std::weak_ptr< Player > weakPlayer;
     static Texture img;
 
-    Vector<float,3> s;
-    Platform *plat, *prevPlat;
+    Player( Platform* p );
 
-    float jumpCoolDown;
-    float maxJumpCoolDown;
-
-    Player();
-
-    void move( float dt );
-
+    Platform* choose_next_plat();
+    
     void draw();
 
     float jump_completion() const;
 };
-
