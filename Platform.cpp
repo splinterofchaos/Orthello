@@ -37,28 +37,14 @@ Platform::Platform( const Vec& pos )
     }
 }
 
-void Platform::draw()
+void Platform::draw_circlular_plat()
 {
-    float z = height();
-
-    glPushMatrix();
-    glTranslatef( s.x(), s.y(), 0 );
-
     typedef Vector<float,3> Vec3;
-
-    // TOP MAP
-    //
-    // Top view   Side view
-    // 1-----2      _____  -
-    // |\   /|     /     \ | SLOPE_H
-    // | 3-4 |     ------- -
-    // | | | |    |-|
-    // | 5-6 |    SLOPE_W
-    // |/   \|
-    // 7_____8
 
     const float SLOPE_H = 0.7;
     const float SLOPE_W = 0.75;
+
+    float z = height();
 
     Vector<float,3> circleT[ CIRCLE_SIZE ];
     for( size_t i=0; i < CIRCLE_SIZE; i++ )
@@ -129,6 +115,14 @@ void Platform::draw()
     draw::draw( side, GL_TRIANGLE_STRIP );
 
     glDisableClientState( GL_NORMAL_ARRAY );
+}
+
+void Platform::draw()
+{
+    glPushMatrix();
+    glTranslatef( s.x(), s.y(), 0 );
+
+    draw_circlular_plat();
 
     glPopMatrix();
 }
@@ -143,4 +137,30 @@ void Platform::add_adjacent( Platform* p )
 float Platform::height()
 {
     return scale * scale / 20;
+}
+
+bool Platform::collide( Platform& p1, Platform& p2, float fuzziness )
+{
+    bool intersecting = false;
+
+    Vector<float,2> diff = p2.s - p1.s;
+    float dist = magnitude( diff );
+
+    // Comb(ined) scale.
+    float combScale = p1.scale + p2.scale;
+    combScale *= fuzziness;
+
+    switch( N_SIDES ) 
+    {
+      case CIRCLE: intersecting = dist < combScale; break;
+
+      case SQUARE: 
+        intersecting = std::abs(diff.x()) < combScale
+                    && std::abs(diff.y()) < combScale;
+        break;
+
+      default: break;
+    }
+
+    return intersecting;
 }
