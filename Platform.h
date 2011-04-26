@@ -40,6 +40,7 @@ class Platform
     void add_adjacent( Platform* );
     float height();
 
+    void draw_square_plat();
     void draw_circlular_plat();
     static bool collide( Platform& p1, Platform& p2, float fuzziness=1 );
 };
