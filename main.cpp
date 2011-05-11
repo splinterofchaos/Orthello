@@ -281,22 +281,23 @@ int main( int, char** )
             if( actors[i]->deleteMe )
                 actors.erase( actors.begin() + i );
 
-        for( size_t i=0; i < platforms.size(); i++ )
-            platforms[i].draw();
-
-        for( size_t i=0; i < actors.size(); i++ )
-            actors[i]->draw();
-
         static Timer realTimer;
         realTimer.update();
-        static int lastUpdate = realTimer.time_ms();
-        if( lastUpdate + IDEAL_FRAME_TIME/2 <= realTimer.time_ms() ) {
-            update_screen();
+        static int lastUpdate = 0;
+        if( lastUpdate + IDEAL_FRAME_TIME/2 <= realTimer.time_ms() ) 
+        {
+            lastUpdate = realTimer.time_ms();
 
+            for( size_t i=0; i < platforms.size(); i++ )
+                platforms[i].draw();
+
+            for( size_t i=0; i < actors.size(); i++ )
+                actors[i]->draw();
+
+            update_screen();
             glLoadIdentity();
 
             GLfloat camPos[] = { 0, 0, 0, 1 };
-
             glLightfv( GL_LIGHT1, GL_POSITION, camPos );
 
             // Rotate the scene for the next run.
@@ -319,6 +320,10 @@ int main( int, char** )
 
             // Center the camera on the player.
             glTranslatef( x, y, -z );
+        } 
+        else // Do not update.
+        {
+            SDL_Delay( 0 );
         }
         
         if( paused )
